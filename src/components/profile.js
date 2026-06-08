@@ -44,6 +44,31 @@ export function renderProfilePanel(container, onProfileUpdated) {
           </md-outlined-text-field>
         </div>
 
+        <div class="grid-2">
+          <md-outlined-text-field
+            id="parent-name"
+            label="Your Name (Parent/Caregiver)"
+            value="${profile.parentName || ''}"
+            required
+            style="width: 100%;">
+          </md-outlined-text-field>
+
+          <md-outlined-select id="parent-role" label="Relation" style="width: 100%;">
+            <md-select-option value="Mom" ${profile.parentRole === 'Mom' ? 'selected' : ''}>
+              <div slot="headline">Mom 👩</div>
+            </md-select-option>
+            <md-select-option value="Dad" ${profile.parentRole === 'Dad' ? 'selected' : ''}>
+              <div slot="headline">Dad 👨</div>
+            </md-select-option>
+            <md-select-option value="Caregiver" ${profile.parentRole === 'Caregiver' ? 'selected' : ''}>
+              <div slot="headline">Caregiver 🧑</div>
+            </md-select-option>
+            <md-select-option value="Grandparent" ${profile.parentRole === 'Grandparent' ? 'selected' : ''}>
+              <div slot="headline">Grandparent 👵</div>
+            </md-select-option>
+          </md-outlined-select>
+        </div>
+
         <div class="form-group">
           <label for="baby-country">Country / Culture Style</label>
           <md-outlined-select id="baby-country" style="width: 100%;">
@@ -149,6 +174,8 @@ export function renderProfilePanel(container, onProfileUpdated) {
     const nameVal = container.querySelector('#baby-name').value || "My Baby";
     const ageVal = parseInt(container.querySelector('#baby-age').value, 10) || 6;
     const countryVal = container.querySelector('#baby-country').value || "us";
+    const parentNameVal = container.querySelector('#parent-name').value || "";
+    const parentRoleVal = container.querySelector('#parent-role').value || "Mom";
 
     // Read selected diets
     const diet = [];
@@ -171,7 +198,9 @@ export function renderProfilePanel(container, onProfileUpdated) {
       age: ageVal,
       country: countryVal,
       diet,
-      allergies
+      allergies,
+      parentName: parentNameVal,
+      parentRole: parentRoleVal
     };
 
     localStorage.setItem('todfeed_profile', JSON.stringify(updatedProfile));

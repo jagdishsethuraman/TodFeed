@@ -59,7 +59,7 @@ export function renderHomePanel(container, getProfile, switchPanel) {
       <div class="card welcome-card">
         <div class="welcome-card-content">
           <div class="welcome-text-slot">
-            <h2>Hi, Caregiver! 👋</h2>
+            <h2>Hi, ${profile.parentName || 'Caregiver'}! 👋</h2>
             <p class="welcome-message">
               Ready to feed <strong>${profile.name}</strong> today? Let's track their meal milestones and keep feeding stress-free!
             </p>

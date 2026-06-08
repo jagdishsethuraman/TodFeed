@@ -9,6 +9,8 @@ export function initializeOnboarding(overlayContainer, onComplete) {
   let babyCountry = "us";
   let babyDiet = [];
   let babyAllergies = [];
+  let parentName = "";
+  let parentRole = "Mom";
 
   const totalSlides = 8;
 
@@ -128,6 +130,35 @@ export function initializeOnboarding(overlayContainer, onComplete) {
               </md-outlined-text-field>
               <p id="onboard-name-error" style="color: var(--md-sys-color-error); font-size: 11px; font-weight: 800; margin-top: 4px; display: none; text-align: left;">
                 Please enter a name to continue!
+              </p>
+
+              <div style="display: flex; gap: 12px; margin-top: 20px; align-items: flex-start;">
+                <md-outlined-text-field
+                  id="input-onboard-parent-name"
+                  label="Your Name"
+                  placeholder="E.g., Sarah, John"
+                  value="${parentName}"
+                  style="flex: 1;"
+                  required>
+                </md-outlined-text-field>
+
+                <md-outlined-select id="input-onboard-parent-role" style="width: 140px;">
+                  <md-select-option value="Mom" ${parentRole === 'Mom' ? 'selected' : ''}>
+                    <div slot="headline">Mom 👩</div>
+                  </md-select-option>
+                  <md-select-option value="Dad" ${parentRole === 'Dad' ? 'selected' : ''}>
+                    <div slot="headline">Dad 👨</div>
+                  </md-select-option>
+                  <md-select-option value="Caregiver" ${parentRole === 'Caregiver' ? 'selected' : ''}>
+                    <div slot="headline">Caregiver 🧑</div>
+                  </md-select-option>
+                  <md-select-option value="Grandparent" ${parentRole === 'Grandparent' ? 'selected' : ''}>
+                    <div slot="headline">Grandparent 👵</div>
+                  </md-select-option>
+                </md-outlined-select>
+              </div>
+              <p id="onboard-parent-error" style="color: var(--md-sys-color-error); font-size: 11px; font-weight: 800; margin-top: 4px; display: none; text-align: left;">
+                Please enter your name to continue!
               </p>
             </div>
           </div>
@@ -329,12 +360,38 @@ export function initializeOnboarding(overlayContainer, onComplete) {
       const nameInput = overlayContainer.querySelector('#input-onboard-name');
       const errorMsg = overlayContainer.querySelector('#onboard-name-error');
       const name = nameInput ? nameInput.value.trim() : "";
+
+      const parentNameInput = overlayContainer.querySelector('#input-onboard-parent-name');
+      const parentErrorMsg = overlayContainer.querySelector('#onboard-parent-error');
+      const pName = parentNameInput ? parentNameInput.value.trim() : "";
+
+      let isValid = true;
+
       if (name === "") {
         if (errorMsg) errorMsg.style.display = 'block';
         if (nameInput) nameInput.style.borderColor = 'var(--md-sys-color-error)';
-        return false;
+        isValid = false;
+      } else {
+        if (errorMsg) errorMsg.style.display = 'none';
       }
+
+      if (pName === "") {
+        if (parentErrorMsg) parentErrorMsg.style.display = 'block';
+        if (parentNameInput) parentNameInput.style.borderColor = 'var(--md-sys-color-error)';
+        isValid = false;
+      } else {
+        if (parentErrorMsg) parentErrorMsg.style.display = 'none';
+      }
+
+      if (!isValid) return false;
+
       babyName = name;
+      parentName = pName;
+      
+      const roleSelect = overlayContainer.querySelector('#input-onboard-parent-role');
+      if (roleSelect) {
+        parentRole = roleSelect.value;
+      }
     }
     return true;
   }
@@ -354,7 +411,9 @@ export function initializeOnboarding(overlayContainer, onComplete) {
       age: babyAge,
       country: babyCountry,
       diet: babyDiet,
-      allergies: babyAllergies
+      allergies: babyAllergies,
+      parentName: parentName,
+      parentRole: parentRole
     };
 
     // Save profile to LocalStorage
