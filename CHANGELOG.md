@@ -7,6 +7,7 @@ All notable changes to the **Todfeed** project will be documented in this file.
 ## [1.2.0] - 2026-06-08
 
 ### Added
+*   **Mascot & Favicon Integration:** Cropped and set Option C ("Excited Dino holding a bowl and spoon with yellow background") as the official app logo in the header and `favicon.png` in the browser tab.
 *   **Custom Ingredient Input:** Added a text input field and "Add" button to the AI Recipe Generator panel. Parents can now type any custom ingredient (e.g., Quinoa, Salmon, Blueberries) and inject it as a tag directly into the active pantry selection list.
 *   **Mascot Design Assets:** Generated and added the high-resolution app icon options grid and baby dinosaur mascot variations grid (`public/app_icon_options.png` and `public/todfeed_dino_mascot_variations.png`) to public assets.
 
