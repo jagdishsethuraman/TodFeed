@@ -7,6 +7,7 @@ All notable changes to the **Todfeed** project will be documented in this file.
 ## [1.2.0] - 2026-06-08
 
 ### Added
+*   **Safety Checker AI Integration:** Added support for Gemini AI in the food safety search box. In addition to standard safety alerts, it now suggests 3-4 baby-safe food pairings (with '+ Pantry' buttons to inject them into active ingredients list) and custom cooking tips.
 *   **Home Dashboard Panel:** Introduced a new default landing Dashboard screen featuring the selected baby dinosaur mascot logo, interactive progress stats, next meal shortcut checklist, and quick links.
 *   **Mascot & Favicon Integration:** Cropped and set Option C ("Excited Dino holding a bowl and spoon with yellow background") as the official app logo in the header and `favicon.png` in the browser tab.
 *   **Custom Ingredient Input:** Added a text input field and "Add" button to the AI Recipe Generator panel. Parents can now type any custom ingredient (e.g., Quinoa, Salmon, Blueberries) and inject it as a tag directly into the active pantry selection list.
