@@ -10,6 +10,7 @@ All notable changes to the **Todfeed** project will be documented in this file.
 
 ### Added
 *   **Caregiver Profiling & Greetings:** Added fields for the caregiver's name and role (Mom 👩, Dad 👨, Caregiver 🧑, Grandparent 👵) in both the first-time onboarding wizard and the Baby Profile settings panel, dynamically personalizing the Home Dashboard greeting (e.g., "Hi, Sarah!").
+*   **Reset App Action:** Added a "Reset App" button inside the Settings dialog, allowing caregivers and testers to clear profile/preferences/meal states and restart the onboarding wizard instantly (while keeping their Gemini API key).
 
 ---
 

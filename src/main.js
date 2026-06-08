@@ -58,7 +58,29 @@ document.addEventListener('DOMContentLoaded', () => {
   const settingsDialog = document.getElementById('settings-dialog');
   const btnSettingsCancel = document.getElementById('btn-settings-cancel');
   const btnSettingsSave = document.getElementById('btn-settings-save');
+  const btnSettingsReset = document.getElementById('btn-settings-reset');
   const inputApiKey = document.getElementById('input-api-key');
+
+  // Reset App / Onboarding trigger
+  if (btnSettingsReset) {
+    btnSettingsReset.addEventListener('click', () => {
+      if (confirm("Are you sure you want to reset all baby preferences, profile details, and meal timeline history? This will restart the onboarding wizard. Your Gemini API key will be kept.")) {
+        localStorage.removeItem('todfeed_onboarded');
+        localStorage.removeItem('todfeed_profile');
+        localStorage.removeItem('todfeed_pantry');
+        
+        // Clear all baby schedules
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('todfeed_schedule_')) {
+            localStorage.removeItem(key);
+          }
+        }
+        
+        location.reload();
+      }
+    });
+  }
 
   // Load existing API key to display in settings
   const existingApiKey = localStorage.getItem('gemini_api_key');
