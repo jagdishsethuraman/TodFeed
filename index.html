@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todfeed - Smart Baby Food Prep & Planner</title>
+    <!-- Google Fonts: Outfit & Material Symbols Rounded -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/theme.css">
+  </head>
+  <body>
+    <div id="app">
+      <!-- App Header -->
+      <header class="app-header">
+        <div class="logo-container">
+          <span class="material-symbols-rounded logo-icon">child_care</span>
+          <div class="logo-text">
+            <h1>Todfeed</h1>
+            <p>Smart Baby Food Assistant</p>
+          </div>
+        </div>
+        <button id="btn-settings" class="icon-button" aria-label="Settings">
+          <span class="material-symbols-rounded">settings</span>
+        </button>
+      </header>
+
+      <!-- Main Panels Container -->
+      <main class="app-main">
+        <!-- Profile Panel -->
+        <section id="panel-profile" class="app-panel active"></section>
+
+        <!-- AI Recipe Panel -->
+        <section id="panel-recipe" class="app-panel"></section>
+
+        <!-- Daily Planner Panel -->
+        <section id="panel-planner" class="app-panel"></section>
+
+        <!-- Safety Panel -->
+        <section id="panel-safety" class="app-panel"></section>
+      </main>
+
+      <!-- Bottom Navigation Bar -->
+      <nav class="app-nav">
+        <md-navigation-bar id="bottom-nav">
+          <md-navigation-tab label="Baby Profile" value="profile" active>
+            <span slot="active-icon" class="material-symbols-rounded">child_care</span>
+            <span slot="inactive-icon" class="material-symbols-rounded">child_care</span>
+          </md-navigation-tab>
+          <md-navigation-tab label="AI Recipes" value="recipe">
+            <span slot="active-icon" class="material-symbols-rounded">restaurant</span>
+            <span slot="inactive-icon" class="material-symbols-rounded">restaurant</span>
+          </md-navigation-tab>
+          <md-navigation-tab label="Daily Sheet" value="planner">
+            <span slot="active-icon" class="material-symbols-rounded">calendar_month</span>
+            <span slot="inactive-icon" class="material-symbols-rounded">calendar_month</span>
+          </md-navigation-tab>
+          <md-navigation-tab label="Safety & Tips" value="safety">
+            <span slot="active-icon" class="material-symbols-rounded">health_and_safety</span>
+            <span slot="inactive-icon" class="material-symbols-rounded">health_and_safety</span>
+          </md-navigation-tab>
+        </md-navigation-bar>
+      </nav>
+    </div>
+
+    <!-- Settings Modal (Custom Playful Duolingo Style) -->
+    <div id="settings-dialog" class="duo-modal-overlay">
+      <div class="duo-modal-card">
+        <div class="duo-modal-header">
+          <span class="material-symbols-rounded logo-icon" style="color: white; background: var(--color-primary); padding: 6px; border-radius: 10px; font-size: 20px;">settings</span>
+          <h2>API Settings</h2>
+        </div>
+        <div class="duo-modal-content">
+          <p class="settings-desc">To unlock true AI-powered customized recipes, enter your Gemini API Key below. The key is stored securely in your browser's local storage.</p>
+          <md-outlined-text-field
+            id="input-api-key"
+            label="Gemini API Key"
+            type="password"
+            supporting-text="Your key stays on this device"
+            style="width: 100%; margin-top: 20px;">
+          </md-outlined-text-field>
+        </div>
+        <div class="duo-modal-actions">
+          <button id="btn-settings-cancel" class="duo-btn duo-btn-outline" style="height: 40px; font-size: 14px;" type="button">Cancel</button>
+          <button id="btn-settings-save" class="duo-btn duo-btn-primary" style="height: 40px; font-size: 14px;" type="button">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Module Script -->
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

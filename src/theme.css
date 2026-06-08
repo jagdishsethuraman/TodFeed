@@ -1,0 +1,900 @@
+/* Todfeed - Playful Duolingo-inspired Styling & Design System */
+
+:root {
+  /* Duolingo Theme Colors (Light Mode) */
+  --color-primary: #58cc02;          /* Duolingo Green */
+  --color-primary-dark: #46a302;
+  --color-primary-light: #d7f5b7;
+  --color-primary-text: #3c3c3c;
+
+  --color-secondary: #ff9600;        /* Duolingo Orange */
+  --color-secondary-dark: #e67c00;
+  --color-secondary-light: #ffebd0;
+
+  --color-tertiary: #1cb0f6;         /* Duolingo Blue */
+  --color-tertiary-dark: #1899d6;
+  --color-tertiary-light: #d8f3ff;
+
+  --color-yellow: #ffc800;           /* Duolingo Yellow */
+  --color-yellow-dark: #e6b000;
+  --color-yellow-light: #fff8d4;
+
+  --color-error: #ff4b4b;            /* Duolingo Red */
+  --color-error-dark: #ea2b2b;
+  --color-error-light: #ffdbdb;
+
+  --color-background: #ffffff;
+  --color-card-bg: #ffffff;
+  --color-border: #e5e5e5;
+  --color-border-dark: #d0d0d0;
+  --color-text: #3c3c3c;
+  --color-text-light: #afafaf;
+  --color-text-dark: #1a1a1a;
+
+  /* HSL Mappings for Material 3 System Colors */
+  --md-sys-color-primary: var(--color-primary);
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: var(--color-primary-light);
+  --md-sys-color-on-primary-container: var(--color-primary-dark);
+  
+  --md-sys-color-secondary: var(--color-secondary);
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: var(--color-secondary-light);
+  --md-sys-color-on-secondary-container: var(--color-secondary-dark);
+  
+  --md-sys-color-tertiary: var(--color-tertiary);
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: var(--color-tertiary-light);
+  --md-sys-color-on-tertiary-container: var(--color-tertiary-dark);
+
+  --md-sys-color-background: var(--color-background);
+  --md-sys-color-on-background: var(--color-text);
+  
+  --md-sys-color-surface: var(--color-card-bg);
+  --md-sys-color-on-surface: var(--color-text);
+  --md-sys-color-surface-container: var(--color-card-bg);
+  --md-sys-color-surface-container-low: var(--color-card-bg);
+  --md-sys-color-surface-container-high: #f7f7f7;
+  
+  --md-sys-color-outline: var(--color-border);
+  --md-sys-color-outline-variant: var(--color-border);
+  
+  --md-sys-color-error: var(--color-error);
+  --md-sys-color-on-error: #ffffff;
+  --md-sys-color-error-container: var(--color-error-light);
+  --md-sys-color-on-error-container: var(--color-error-dark);
+
+  /* Typography */
+  --md-sys-typescale-body-large-font: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --md-sys-typescale-headline-large-font: 'Outfit', system-ui, sans-serif;
+
+  --font-heading: 'Outfit', system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --border-radius-sm: 16px;
+  --border-radius-md: 20px;
+  --border-radius-lg: 28px;
+  
+  --header-height: 72px;
+  --nav-height: 80px;
+
+  /* Custom overrides for M3 component shapes */
+  --md-outlined-text-field-container-shape: 16px;
+  --md-outlined-text-field-outline-width: 2px;
+  --md-outlined-text-field-focus-outline-width: 2px;
+  --md-outlined-select-container-shape: 16px;
+  --md-outlined-select-outline-width: 2px;
+  --md-checkbox-container-shape: 6px;
+}
+
+/* Dark Mode Overrides */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-primary: #78e22f;          /* Brighter for contrast */
+    --color-primary-dark: #46a302;
+    --color-primary-light: #233e11;
+
+    --color-secondary: #ffaa24;
+    --color-secondary-dark: #c26000;
+    --color-secondary-light: #4c2c00;
+
+    --color-tertiary: #4ec5f9;
+    --color-tertiary-dark: #1899d6;
+    --color-tertiary-light: #0d354c;
+
+    --color-error: #ff6b6b;
+    --color-error-dark: #ea2b2b;
+    --color-error-light: #4a1515;
+
+    --color-background: #131f24;       /* Duolingo Dark background */
+    --color-card-bg: #1b2d35;
+    --color-border: #3b4c54;
+    --color-border-dark: #2b3a41;
+    --color-text: #f1f1f1;
+    --color-text-light: #809099;
+    --color-text-dark: #ffffff;
+
+    --md-sys-color-surface-container-high: #131f24;
+  }
+}
+
+/* Global Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-background);
+  color: var(--color-text);
+  transition: background-color 0.2s ease, color 0.2s ease;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Layout Shell */
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-bottom: var(--nav-height);
+}
+
+/* Header */
+.app-header {
+  height: var(--header-height);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-card-bg);
+  border-bottom: 3px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  font-size: 32px;
+  color: #ffffff;
+  background: var(--color-primary);
+  padding: 8px;
+  border-radius: 14px;
+  border-bottom: 3px solid var(--color-primary-dark);
+}
+
+.logo-text h1 {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-primary);
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+}
+
+.logo-text p {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+/* Settings Icon Button */
+.icon-button {
+  background: var(--color-card-bg);
+  border: 2px solid var(--color-border);
+  border-bottom: 4px solid var(--color-border-dark);
+  cursor: pointer;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  color: var(--color-text);
+  transition: all 0.1s;
+}
+
+.icon-button:hover {
+  background-color: var(--md-sys-color-surface-container-high);
+}
+
+.icon-button:active {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+}
+
+/* Main Content Area */
+.app-main {
+  flex: 1;
+  max-width: 650px; /* Snugger width for clean mobile presentation */
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+/* Panels switching mechanism */
+.app-panel {
+  display: none;
+  animation: bounce-in 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.app-panel.active {
+  display: block;
+}
+
+/* Bottom Navigation Bar - Duolingo Skin */
+.app-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+#bottom-nav {
+  width: 100%;
+  --md-navigation-bar-container-color: var(--color-card-bg);
+  --md-navigation-bar-active-indicator-color: transparent; /* Remove pill */
+  --md-navigation-bar-active-label-text-color: var(--color-primary);
+  --md-navigation-bar-active-icon-color: var(--color-primary);
+  --md-navigation-bar-inactive-label-text-color: var(--color-text-light);
+  --md-navigation-bar-inactive-icon-color: var(--color-text-light);
+  --md-navigation-bar-label-text-font: 'Outfit', sans-serif;
+  --md-navigation-bar-label-text-weight: 700;
+  border-top: 3px solid var(--color-border);
+}
+
+#bottom-nav md-navigation-tab {
+  --md-navigation-tab-active-label-text-color: var(--color-primary);
+  --md-navigation-tab-active-icon-color: var(--color-primary);
+}
+
+#bottom-nav md-navigation-tab span {
+  font-weight: 800 !important;
+}
+
+/* Cartoonish 3D Flat Cards */
+.card {
+  background-color: var(--color-card-bg);
+  border: 2px solid var(--color-border);
+  border-bottom: 6px solid var(--color-border-dark);
+  border-radius: var(--border-radius-md);
+  padding: 24px;
+  margin-bottom: 20px;
+  transition: all 0.1s;
+}
+
+.card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.card-title-row .material-symbols-rounded {
+  color: var(--color-primary);
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.card-title-row h2 {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-text-dark);
+  letter-spacing: -0.5px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* Playful Flat-3D Buttons Skin (Duolingo Style) */
+.duo-btn {
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  height: 50px;
+  padding: 0 24px;
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.1s ease;
+  user-select: none;
+  position: relative;
+  top: 0;
+  text-decoration: none;
+  width: auto;
+}
+
+/* Primary Green Button */
+.duo-btn-primary {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  box-shadow: 0 4px 0 var(--color-primary-dark);
+}
+.duo-btn-primary:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+.duo-btn-primary:active:not(:disabled) {
+  top: 3px;
+  box-shadow: 0 1px 0 var(--color-primary-dark);
+}
+
+/* Secondary Orange Button */
+.duo-btn-secondary {
+  background-color: var(--color-secondary);
+  color: #ffffff;
+  box-shadow: 0 4px 0 var(--color-secondary-dark);
+}
+.duo-btn-secondary:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+.duo-btn-secondary:active:not(:disabled) {
+  top: 3px;
+  box-shadow: 0 1px 0 var(--color-secondary-dark);
+}
+
+/* Tertiary Blue Button */
+.duo-btn-tertiary {
+  background-color: var(--color-tertiary);
+  color: #ffffff;
+  box-shadow: 0 4px 0 var(--color-tertiary-dark);
+}
+.duo-btn-tertiary:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+.duo-btn-tertiary:active:not(:disabled) {
+  top: 3px;
+  box-shadow: 0 1px 0 var(--color-tertiary-dark);
+}
+
+/* Outline/Gray Button */
+.duo-btn-outline {
+  background-color: var(--color-card-bg);
+  color: var(--color-text);
+  border: 2px solid var(--color-border);
+  box-shadow: 0 4px 0 var(--color-border);
+  height: 48px; /* Offset border width */
+}
+.duo-btn-outline:hover:not(:disabled) {
+  background-color: var(--md-sys-color-surface-container-high);
+}
+.duo-btn-outline:active:not(:disabled) {
+  top: 3px;
+  box-shadow: 0 1px 0 var(--color-border);
+}
+
+/* Red / Danger Button */
+.duo-btn-danger {
+  background-color: var(--color-error);
+  color: #ffffff;
+  box-shadow: 0 4px 0 var(--color-error-dark);
+}
+.duo-btn-danger:active:not(:disabled) {
+  top: 3px;
+  box-shadow: 0 1px 0 var(--color-error-dark);
+}
+
+/* Disabled State */
+.duo-btn:disabled {
+  background-color: var(--color-border) !important;
+  color: var(--color-text-light) !important;
+  box-shadow: none !important;
+  cursor: not-allowed;
+  top: 0 !important;
+  transform: none !important;
+  border: none !important;
+}
+
+/* Playful Custom Input Fields & Selectors */
+md-outlined-text-field, md-outlined-select {
+  --md-outlined-text-field-label-text-weight: 700;
+  --md-outlined-text-field-container-shape: 16px;
+  --md-outlined-text-field-outline-color: var(--color-border);
+  --md-outlined-text-field-focus-outline-color: var(--color-primary);
+  --md-outlined-select-outline-color: var(--color-border);
+  --md-outlined-select-focus-outline-color: var(--color-primary);
+}
+
+/* Filter Chips (Ingredient Selectors) - Cartoon style */
+md-filter-chip {
+  --md-filter-chip-container-shape: 16px;
+  --md-filter-chip-outline-color: var(--color-border);
+  --md-filter-chip-outline-width: 2px;
+  --md-filter-chip-label-text-font: var(--font-body);
+  --md-filter-chip-label-text-weight: 700;
+  --md-filter-chip-selected-container-color: var(--color-primary-light);
+  --md-filter-chip-selected-outline-color: var(--color-primary);
+  --md-filter-chip-selected-label-text-color: var(--color-primary-dark);
+  
+  margin: 2px;
+}
+
+md-input-chip {
+  --md-input-chip-container-shape: 16px;
+  --md-input-chip-outline-color: var(--color-primary);
+  --md-input-chip-container-color: var(--color-primary-light);
+  --md-input-chip-label-text-color: var(--color-primary-dark);
+  --md-input-chip-label-text-weight: 700;
+}
+
+/* Pantry categories */
+.pantry-section {
+  background: var(--color-background);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.selected-ingredients-bar {
+  background-color: var(--color-tertiary-light);
+  padding: 16px;
+  border-radius: var(--border-radius-sm);
+  margin-bottom: 20px;
+  border: 2px dashed var(--color-tertiary);
+}
+
+.selected-ingredients-bar p {
+  font-size: 13px;
+  color: var(--color-tertiary-dark);
+  margin-bottom: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Playful form layout groups */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text);
+  margin-left: 4px;
+}
+
+/* Safety alerts (Chunky Red Warnings) */
+.safety-alert-card {
+  background-color: var(--color-error-light);
+  color: var(--color-error-dark);
+  border-radius: var(--border-radius-sm);
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  border: 2px solid var(--color-error);
+  align-items: flex-start;
+  animation: shake 0.5s ease-in-out;
+}
+
+.safety-alert-card span {
+  font-size: 28px;
+  flex-shrink: 0;
+  color: var(--color-error);
+}
+
+.safety-alert-card .content h4 {
+  font-weight: 800;
+  font-size: 14px;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.safety-alert-card .content p {
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 500;
+}
+
+/* Loader Animation */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 0;
+  gap: 16px;
+}
+
+.loading-container p {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--color-tertiary-dark);
+  text-transform: uppercase;
+}
+
+/* Matched Recipe summaries */
+.recipe-summary-card {
+  border: 2px solid var(--color-border);
+  border-bottom: 6px solid var(--color-border-dark);
+  border-radius: var(--border-radius-sm);
+  padding: 16px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.recipe-summary-card:active {
+  transform: translateY(3px);
+  border-bottom-width: 3px;
+}
+
+/* Recipe Details Card */
+.recipe-container {
+  animation: slide-up 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.recipe-header {
+  border-bottom: 2px solid var(--color-border);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.recipe-header h3 {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-primary-dark);
+}
+
+.recipe-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--color-text-light);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.recipe-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--color-background);
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+}
+
+.recipe-section-title {
+  font-size: 16px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-dark);
+  margin: 20px 0 10px 0;
+}
+
+.recipe-list {
+  padding-left: 20px;
+  font-size: 14px;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.recipe-step {
+  display: flex;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.recipe-step-num {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  border-bottom: 2px solid var(--color-primary-dark);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.recipe-benefit {
+  background-color: var(--color-tertiary-light);
+  color: var(--color-tertiary-dark);
+  padding: 16px;
+  border-radius: var(--border-radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  border: 2px solid var(--color-tertiary);
+  margin-top: 20px;
+}
+
+/* Daily Planner Meal Slots */
+.planner-header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.meal-slot-card {
+  border-left: 6px solid var(--color-primary);
+}
+
+.meal-slot-card.completed {
+  border-left-color: var(--color-text-light);
+  opacity: 0.75;
+}
+
+.meal-slot-time {
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffffff;
+  background-color: var(--color-primary-dark);
+  padding: 4px 10px;
+  border-radius: 8px;
+  text-transform: uppercase;
+}
+
+.completed .meal-slot-time {
+  background-color: var(--color-text-light);
+}
+
+.meal-slot-title {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-text-dark);
+  margin-top: 6px;
+}
+
+.meal-slot-desc {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+/* Emojis Reaction Buttons */
+.rating-btn {
+  background: var(--color-card-bg);
+  border: 2px solid var(--color-border);
+  border-bottom: 4px solid var(--color-border-dark);
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  transition: all 0.1s;
+}
+
+.rating-btn:hover {
+  background-color: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+
+.rating-btn.active {
+  background-color: var(--color-primary-light);
+  border-color: var(--color-primary);
+  border-bottom-width: 2px;
+  transform: translateY(2px);
+}
+
+/* Floating FAB */
+.fab-container {
+  position: fixed;
+  bottom: 96px;
+  right: 24px;
+  z-index: 99;
+}
+
+md-fab {
+  --md-fab-container-shape: 16px;
+  --md-fab-container-color: var(--color-primary);
+  --md-fab-icon-color: #ffffff;
+  --md-fab-label-text-color: #ffffff;
+  --md-fab-label-text-font: var(--font-heading);
+  --md-fab-label-text-weight: 800;
+  box-shadow: 0 4px 0 var(--color-primary-dark);
+}
+
+/* Safety Page Customizations */
+md-tabs {
+  --md-tabs-active-indicator-color: var(--color-primary);
+  --md-tabs-active-label-text-color: var(--color-primary);
+  --md-tabs-inactive-label-text-color: var(--color-text-light);
+  --md-tabs-label-text-font: var(--font-heading);
+  --md-tabs-label-text-weight: 800;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.safety-grid-card {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  background-color: var(--color-card-bg);
+  border: 2px solid var(--color-border);
+  border-bottom: 6px solid var(--color-border-dark);
+  border-radius: var(--border-radius-md);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.safety-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: #ffffff;
+}
+
+.safety-icon-box.green {
+  background-color: var(--color-primary);
+  border-bottom: 3px solid var(--color-primary-dark);
+}
+
+.safety-icon-box.orange {
+  background-color: var(--color-secondary);
+  border-bottom: 3px solid var(--color-secondary-dark);
+}
+
+.safety-icon-box.red {
+  background-color: var(--color-error);
+  border-bottom: 3px solid var(--color-error-dark);
+}
+
+.safety-info h3 {
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: 6px;
+  color: var(--color-text-dark);
+}
+
+.safety-info p {
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+/* Custom Playful Duolingo-style Modal Overlay */
+.duo-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+  animation: fade-in 0.15s ease-out forwards;
+}
+
+.duo-modal-overlay.active {
+  display: flex;
+}
+
+.duo-modal-card {
+  background-color: var(--color-card-bg);
+  border: 2px solid var(--color-border);
+  border-bottom: 8px solid var(--color-border-dark);
+  border-radius: var(--border-radius-lg);
+  max-width: 460px;
+  width: 100%;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: scale-up 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.duo-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.duo-modal-header h2 {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-text-dark);
+  letter-spacing: -0.5px;
+}
+
+.duo-modal-content {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text);
+}
+
+.duo-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+@keyframes scale-up {
+  0% { transform: scale(0.9); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Print View overrides */
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+  .app-header, .app-nav, .fab-container, #btn-settings {
+    display: none !important;
+  }
+  .app-main {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .app-panel {
+    display: none !important;
+  }
+  #panel-planner {
+    display: block !important;
+  }
+  .card {
+    border: 1px solid #cccccc !important;
+    border-bottom: 1px solid #cccccc !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+  .meal-slot-actions {
+    display: none !important;
+  }
+}
+
+/* Animations */
+@keyframes bounce-in {
+  0% { transform: scale(0.95); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slide-up {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
