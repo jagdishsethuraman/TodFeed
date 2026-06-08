@@ -1750,22 +1750,42 @@ md-tabs {
   flex-shrink: 0;
   justify-self: center;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  animation: onboard-mascot-float 4s ease-in-out infinite;
 }
 
+/* Tonal background colors matching the squircles to eliminate any white edge leakage */
+.onboard-mascot-frame.frame-q1 { background-color: #8ac376; }
+.onboard-mascot-frame.frame-q2 { background-color: #b29ce5; }
+.onboard-mascot-frame.frame-q3 { background-color: #f9e280; }
+.onboard-mascot-frame.frame-q4 { background-color: #94d9f8; }
+
 .onboard-mascot-sprite {
-  width: 192px;
-  height: 192px;
+  width: 208px;
+  height: 208px;
   background-image: url('/todfeed_dino_spoon_variations.png');
-  background-size: 192px 192px;
+  background-size: 208px 208px;
   position: absolute;
   top: 0;
   left: 0;
 }
 
-.sprite-q1 { background-position: -14px -14px; }
-.sprite-q2 { background-position: -110px -14px; }
-.sprite-q3 { background-position: -14px -110px; }
-.sprite-q4 { background-position: -110px -110px; }
+.sprite-q1 { background-position: -12px -12px; }
+.sprite-q2 { background-position: -116px -12px; }
+.sprite-q3 { background-position: -12px -116px; }
+.sprite-q4 { background-position: -116px -116px; }
+
+@keyframes onboard-mascot-float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-4px) rotate(1.5deg);
+  }
+}
+
+.onboard-mascot-frame.animate-bounce-slow {
+  animation: bounce-slow 2s infinite ease-in-out;
+}
 
 .onboard-text-frame {
   display: flex;
