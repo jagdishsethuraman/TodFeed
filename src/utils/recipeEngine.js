@@ -417,13 +417,13 @@ Return ONLY a JSON object. Do not include markdown code block formatting (no \`\
 
   const modelsToTry = [
     'gemini-3.5-flash',
+    'gemini-3.1-pro',
     'gemini-2.5-flash',
-    'gemini-2.5-pro',
-    'gemini-1.5-flash'
+    'gemini-2.5-pro'
   ];
 
   const genAI = new GoogleGenerativeAI(apiKey);
-  let lastError = null;
+  const errors = [];
 
   for (const modelName of modelsToTry) {
     try {
@@ -443,17 +443,18 @@ Return ONLY a JSON object. Do not include markdown code block formatting (no \`\
       return JSON.parse(cleanJson);
     } catch (error) {
       console.warn(`Model ${modelName} failed:`, error);
-      lastError = error;
       
-      // If the error message suggests a authentication or quota issue rather than "not found" (404),
-      // we could abort, but continuing to try other models ensures maximum resilience.
-      if (error.message && (error.message.includes("API key") || error.message.includes("invalid key") || error.message.includes("API_KEY_INVALID"))) {
+      const errMsg = error.message || String(error);
+      const lowerMsg = errMsg.toLowerCase();
+      if (lowerMsg.includes("api key") || lowerMsg.includes("api_key") || lowerMsg.includes("invalid key")) {
         throw new Error(`Invalid API Key: Please check your Gemini API Key in the settings dialog.`);
       }
+      
+      errors.push(`${modelName}: ${errMsg}`);
     }
   }
 
-  throw new Error(`Failed to generate recipe via Gemini. Checked models: [${modelsToTry.join(', ')}]. Last error: ${lastError?.message || lastError}`);
+  throw new Error(`Failed to generate recipe via Gemini. Checked models: [${modelsToTry.join(', ')}]. Details:\n${errors.map(e => `- ${e}`).join('\n')}`);
 }
 
 // Daily meal sheet planner generator based on baby profile and country
@@ -666,13 +667,13 @@ Return ONLY a JSON object. Do not include markdown code block formatting (no \`\
 
   const modelsToTry = [
     'gemini-3.5-flash',
+    'gemini-3.1-pro',
     'gemini-2.5-flash',
-    'gemini-2.5-pro',
-    'gemini-1.5-flash'
+    'gemini-2.5-pro'
   ];
 
   const genAI = new GoogleGenerativeAI(apiKey);
-  let lastError = null;
+  const errors = [];
 
   for (const modelName of modelsToTry) {
     try {
@@ -691,13 +692,16 @@ Return ONLY a JSON object. Do not include markdown code block formatting (no \`\
       return JSON.parse(cleanJson);
     } catch (error) {
       console.warn(`Model ${modelName} failed for pairings:`, error);
-      lastError = error;
       
-      if (error.message && (error.message.includes("API key") || error.message.includes("invalid key") || error.message.includes("API_KEY_INVALID"))) {
+      const errMsg = error.message || String(error);
+      const lowerMsg = errMsg.toLowerCase();
+      if (lowerMsg.includes("api key") || lowerMsg.includes("api_key") || lowerMsg.includes("invalid key")) {
         throw new Error(`Invalid API Key: Please check your Gemini API Key in the settings dialog.`);
       }
+      
+      errors.push(`${modelName}: ${errMsg}`);
     }
   }
 
-  throw new Error(`Failed to generate pairings via Gemini. Last error: ${lastError?.message || lastError}`);
+  throw new Error(`Failed to generate pairings via Gemini. Checked models: [${modelsToTry.join(', ')}]. Details:\n${errors.map(e => `- ${e}`).join('\n')}`);
 }

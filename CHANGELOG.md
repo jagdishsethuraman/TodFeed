@@ -2,6 +2,12 @@
 
 All notable changes to the **Todfeed** project will be documented in this file.
 
+## [1.2.1] - 2026-06-08
+
+### Fixed
+*   **Gemini Model Lineup:** Removed the retired `gemini-1.5-flash` model from the API fallback chain, preventing obsolete model 404/403 errors from masking auth issues. Added `gemini-3.1-pro` to the active model options.
+*   **API Error Transparency:** Updated the AI engine to collect and report errors from all attempted models (e.g., `gemini-3.5-flash`, `gemini-3.1-pro`, `gemini-2.5-flash`, `gemini-2.5-pro`) upon complete fallback exhaustion, rather than only reporting the error of the last model.
+
 ---
 
 ## [1.2.0] - 2026-06-08
