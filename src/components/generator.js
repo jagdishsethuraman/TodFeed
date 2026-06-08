@@ -3,7 +3,12 @@
 import { runSafetyChecks, matchLocalRecipes, generateAiRecipe } from '../utils/recipeEngine.js';
 
 export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner) {
-  let selectedIngredients = [];
+  let selectedIngredients = JSON.parse(localStorage.getItem('todfeed_pantry') || '[]');
+
+  function savePantry() {
+    localStorage.setItem('todfeed_pantry', JSON.stringify(selectedIngredients));
+  }
+
   let currentRecipeResult = null;
 
   const categories = {
@@ -143,6 +148,7 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
           const formatted = value.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
           if (!selectedIngredients.includes(formatted)) {
             selectedIngredients.push(formatted);
+            savePantry();
             render();
           } else {
             alert(`"${formatted}" is already in your selected list!`);
@@ -170,6 +176,7 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
         } else {
           selectedIngredients.push(item);
         }
+        savePantry();
         render();
       });
     });
@@ -180,6 +187,7 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
       chip.addEventListener('remove', (e) => {
         const item = e.target.dataset.ing;
         selectedIngredients = selectedIngredients.filter(i => i !== item);
+        savePantry();
         render();
       });
     });
@@ -189,6 +197,7 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
     if (clearBtn) {
       clearBtn.addEventListener('click', () => {
         selectedIngredients = [];
+        savePantry();
         render();
       });
     }

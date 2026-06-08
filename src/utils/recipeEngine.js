@@ -643,3 +643,61 @@ export function generateDailyMealSheet(profile) {
 
   return schedule;
 }
+
+// Gemini AI Food Pairings Generator
+export async function generateAiPairings(ingredient) {
+  const apiKey = localStorage.getItem('gemini_api_key');
+  if (!apiKey) {
+    throw new Error("Gemini API key not found. Configure it in Settings.");
+  }
+
+  const prompt = `You are a pediatric nutritionist. For the food ingredient "${ingredient}", suggest 3 to 4 baby-safe ingredients/foods that it goes well with (food pairings) for a baby. For each pairing, explain why they match nutritionally or flavor-wise.
+Return ONLY a JSON object. Do not include markdown code block formatting (no \`\`\`json tags), just raw JSON. The JSON structure MUST be exactly:
+{
+  "ingredient": "${ingredient}",
+  "pairings": [
+    {
+      "name": "Pairing Ingredient Name",
+      "reason": "Brief explanation why they match."
+    }
+  ],
+  "tips": "Brief advice on preparing these combinations safely."
+}`;
+
+  const modelsToTry = [
+    'gemini-3.5-flash',
+    'gemini-2.5-flash',
+    'gemini-2.5-pro',
+    'gemini-1.5-flash'
+  ];
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  let lastError = null;
+
+  for (const modelName of modelsToTry) {
+    try {
+      console.log(`Attempting pairings generation with model: ${modelName}`);
+      const model = genAI.getGenerativeModel({ model: modelName });
+
+      const result = await model.generateContent({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
+          responseMimeType: 'application/json'
+        }
+      });
+
+      const responseText = result.response.text();
+      const cleanJson = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+      return JSON.parse(cleanJson);
+    } catch (error) {
+      console.warn(`Model ${modelName} failed for pairings:`, error);
+      lastError = error;
+      
+      if (error.message && (error.message.includes("API key") || error.message.includes("invalid key") || error.message.includes("API_KEY_INVALID"))) {
+        throw new Error(`Invalid API Key: Please check your Gemini API Key in the settings dialog.`);
+      }
+    }
+  }
+
+  throw new Error(`Failed to generate pairings via Gemini. Last error: ${lastError?.message || lastError}`);
+}
