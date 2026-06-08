@@ -171,7 +171,9 @@ export function renderHomePanel(container, getProfile, switchPanel) {
     const profileStatLink = container.querySelector('#link-to-profile-stat');
     if (profileStatLink) {
       profileStatLink.addEventListener('click', () => {
-        switchPanel('profile');
+        if (window.openSettings) {
+          window.openSettings('profile');
+        }
       });
     }
 

@@ -31,13 +31,10 @@
         </button>
       </header>
 
-      <!-- Main Panels Container -->
+      <!-- Main Content Panels -->
       <main class="app-main">
         <!-- Home Dashboard Panel -->
         <section id="panel-home" class="app-panel active"></section>
-
-        <!-- Profile Panel -->
-        <section id="panel-profile" class="app-panel"></section>
 
         <!-- AI Recipe Panel -->
         <section id="panel-recipe" class="app-panel"></section>
@@ -55,10 +52,6 @@
           <md-navigation-tab label="Home" value="home" active>
             <span slot="active-icon" class="material-symbols-rounded">home</span>
             <span slot="inactive-icon" class="material-symbols-rounded">home</span>
-          </md-navigation-tab>
-          <md-navigation-tab label="Baby Profile" value="profile">
-            <span slot="active-icon" class="material-symbols-rounded">child_care</span>
-            <span slot="inactive-icon" class="material-symbols-rounded">child_care</span>
           </md-navigation-tab>
           <md-navigation-tab label="AI Recipes" value="recipe">
             <span slot="active-icon" class="material-symbols-rounded">restaurant</span>
@@ -81,19 +74,100 @@
       <div class="duo-modal-card">
         <div class="duo-modal-header">
           <span class="material-symbols-rounded logo-icon" style="color: white; background: var(--color-primary); padding: 6px; border-radius: 10px; font-size: 20px;">settings</span>
-          <h2>API Settings</h2>
+          <h2>Settings</h2>
         </div>
-        <div class="duo-modal-content">
-          <p class="settings-desc">To unlock true AI-powered customized recipes, enter your Gemini API Key below. The key is stored securely in your browser's local storage.</p>
-          <md-outlined-text-field
-            id="input-api-key"
-            label="Gemini API Key"
-            type="password"
-            supporting-text="Your key stays on this device"
-            style="width: 100%; margin-top: 20px;">
-          </md-outlined-text-field>
+        
+        <!-- Tab Headers -->
+        <div class="settings-tabs" style="display: flex; gap: 12px; margin-top: 12px; border-bottom: 2px solid var(--color-border); padding-bottom: 8px;">
+          <button class="settings-tab-btn active" data-tab="profile" type="button" style="background: none; border: none; font-weight: 800; color: var(--color-primary); font-size: 14px; cursor: pointer; padding: 4px 8px; border-bottom: 3px solid var(--color-primary); margin-bottom: -10px;">Baby Profile</button>
+          <button class="settings-tab-btn" data-tab="api" type="button" style="background: none; border: none; font-weight: 700; color: var(--color-text-light); font-size: 14px; cursor: pointer; padding: 4px 8px; margin-bottom: -10px;">Gemini API</button>
         </div>
-        <div class="duo-modal-actions" style="justify-content: space-between; display: flex; width: 100%;">
+
+        <div class="duo-modal-content" style="max-height: 380px; overflow-y: auto; padding-right: 4px; margin-top: 16px;">
+          <!-- Tab 1: Profile Section -->
+          <div id="settings-tab-profile" class="settings-tab-content active" style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <md-outlined-text-field
+                id="settings-baby-name"
+                label="Baby's Name"
+                required
+                style="width: 100%;">
+              </md-outlined-text-field>
+
+              <md-outlined-text-field
+                id="settings-baby-age"
+                label="Age (months)"
+                type="number"
+                min="4"
+                max="24"
+                required
+                style="width: 100%;">
+              </md-outlined-text-field>
+            </div>
+
+            <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <md-outlined-text-field
+                id="settings-parent-name"
+                label="Your Name"
+                required
+                style="width: 100%;">
+              </md-outlined-text-field>
+
+              <md-outlined-select id="settings-parent-role" label="Relation" style="width: 100%;">
+                <md-select-option value="Mom"><div slot="headline">Mom 👩</div></md-select-option>
+                <md-select-option value="Dad"><div slot="headline">Dad 👨</div></md-select-option>
+                <md-select-option value="Caregiver"><div slot="headline">Caregiver 🧑</div></md-select-option>
+                <md-select-option value="Grandparent"><div slot="headline">Grandparent 👵</div></md-select-option>
+              </md-outlined-select>
+            </div>
+
+            <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+              <label style="font-size: 11px; font-weight: 800; color: var(--color-primary-dark); text-transform: uppercase;">Country / Culture Style</label>
+              <md-outlined-select id="settings-baby-country" style="width: 100%;">
+                <md-select-option value="us"><div slot="headline">United States (Oats, Avocado, Squash)</div></md-select-option>
+                <md-select-option value="in"><div slot="headline">India (Dal Khichdi, Cumin, Ghee)</div></md-select-option>
+                <md-select-option value="jp"><div slot="headline">Japan (Rice Okayu, Tofu, Kabocha)</div></md-select-option>
+                <md-select-option value="it"><div slot="headline">Italy (Semolina, Olive Oil, Zucchini)</div></md-select-option>
+              </md-outlined-select>
+            </div>
+
+            <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+              <label style="font-size: 11px; font-weight: 800; color: var(--color-primary-dark); text-transform: uppercase;">Dietary Preferences</label>
+              <div class="ingredient-chips-grid" style="display: flex; flex-wrap: wrap; gap: 6px;">
+                <md-filter-chip id="settings-diet-veg" label="Vegetarian" data-val="vegetarian"></md-filter-chip>
+                <md-filter-chip id="settings-diet-vegan" label="Vegan" data-val="vegan"></md-filter-chip>
+                <md-filter-chip id="settings-diet-df" label="Dairy-Free" data-val="dairy-free"></md-filter-chip>
+                <md-filter-chip id="settings-diet-gf" label="Gluten-Free" data-val="gluten-free"></md-filter-chip>
+              </div>
+            </div>
+
+            <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+              <label style="font-size: 11px; font-weight: 800; color: var(--color-primary-dark); text-transform: uppercase;">Known Allergies</label>
+              <div class="ingredient-chips-grid" style="display: flex; flex-wrap: wrap; gap: 6px;">
+                <md-filter-chip class="settings-allergy-chip" data-allergy="egg" label="Egg"></md-filter-chip>
+                <md-filter-chip class="settings-allergy-chip" data-allergy="dairy" label="Dairy"></md-filter-chip>
+                <md-filter-chip class="settings-allergy-chip" data-allergy="peanut" label="Peanuts"></md-filter-chip>
+                <md-filter-chip class="settings-allergy-chip" data-allergy="wheat" label="Wheat"></md-filter-chip>
+                <md-filter-chip class="settings-allergy-chip" data-allergy="soy" label="Soy"></md-filter-chip>
+                <md-filter-chip class="settings-allergy-chip" data-allergy="fish" label="Fish"></md-filter-chip>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 2: API Section -->
+          <div id="settings-tab-api" class="settings-tab-content" style="display: none; flex-direction: column; gap: 16px;">
+            <p class="settings-desc" style="font-size: 13px; color: var(--color-text-light); line-height: 1.4; text-align: left;">To unlock true AI-powered customized recipes, enter your Gemini API Key below. The key is stored securely in your browser's local storage.</p>
+            <md-outlined-text-field
+              id="input-api-key"
+              label="Gemini API Key"
+              type="password"
+              supporting-text="Your key stays on this device"
+              style="width: 100%;">
+            </md-outlined-text-field>
+          </div>
+        </div>
+
+        <div class="duo-modal-actions" style="justify-content: space-between; display: flex; width: 100%; margin-top: 20px;">
           <button id="btn-settings-reset" class="duo-btn duo-btn-outline" style="height: 40px; font-size: 14px; border-color: #ba1a1a; color: #ba1a1a;" type="button">Reset App</button>
           <div style="display: flex; gap: 8px;">
             <button id="btn-settings-cancel" class="duo-btn duo-btn-outline" style="height: 40px; font-size: 14px;" type="button">Cancel</button>

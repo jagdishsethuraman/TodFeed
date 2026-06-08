@@ -27,7 +27,6 @@ import '@material/web/labs/navigationtab/navigation-tab.js';
 // Import Modular Panel Renderers
 import { initializeOnboarding } from './components/onboarding.js';
 import { renderHomePanel } from './components/home.js';
-import { renderProfilePanel } from './components/profile.js';
 import { renderGeneratorPanel } from './components/generator.js';
 import { renderPlannerPanel } from './components/planner.js';
 import { renderSafetyPanel } from './components/safety.js';
@@ -47,8 +46,9 @@ function getActiveProfile() {
 // App Initialization
 document.addEventListener('DOMContentLoaded', () => {
   const onboardingOverlay = document.getElementById('onboarding-overlay');
+  
+  // Tab panels
   const panelHome = document.getElementById('panel-home');
-  const panelProfile = document.getElementById('panel-profile');
   const panelRecipe = document.getElementById('panel-recipe');
   const panelPlanner = document.getElementById('panel-planner');
   const panelSafety = document.getElementById('panel-safety');
@@ -82,15 +82,74 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Load existing API key to display in settings
-  const existingApiKey = localStorage.getItem('gemini_api_key');
-  if (existingApiKey) {
-    inputApiKey.value = existingApiKey;
+  // Settings Tab Switching
+  const settingsTabBtns = settingsDialog.querySelectorAll('.settings-tab-btn');
+  const settingsTabContents = settingsDialog.querySelectorAll('.settings-tab-content');
+
+  function switchSettingsTab(tabName) {
+    settingsTabBtns.forEach(btn => {
+      if (btn.dataset.tab === tabName) {
+        btn.classList.add('active');
+        btn.style.color = 'var(--color-primary)';
+        btn.style.fontWeight = '800';
+        btn.style.borderBottom = '3px solid var(--color-primary)';
+      } else {
+        btn.classList.remove('active');
+        btn.style.color = 'var(--color-text-light)';
+        btn.style.fontWeight = '700';
+        btn.style.borderBottom = 'none';
+      }
+    });
+
+    settingsTabContents.forEach(content => {
+      if (content.id === `settings-tab-${tabName}`) {
+        content.style.display = 'flex';
+      } else {
+        content.style.display = 'none';
+      }
+    });
   }
 
-  // Settings trigger
+  settingsTabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      switchSettingsTab(btn.dataset.tab);
+    });
+  });
+
+  // Expose global openSettings method for other panels to use
+  window.openSettings = function(tabName = 'profile') {
+    btnSettings.click();
+    switchSettingsTab(tabName);
+  };
+
+  // Settings trigger (Open modal and load values)
   btnSettings.addEventListener('click', () => {
     settingsDialog.classList.add('active');
+    switchSettingsTab('profile'); // Default to profile tab on open
+    
+    // Load current profile state into fields
+    const profile = getActiveProfile();
+    document.getElementById('settings-baby-name').value = profile.name || "";
+    document.getElementById('settings-baby-age').value = profile.age || 6;
+    document.getElementById('settings-parent-name').value = profile.parentName || "";
+    document.getElementById('settings-parent-role').value = profile.parentRole || "Mom";
+    document.getElementById('settings-baby-country').value = profile.country || "us";
+    
+    // Select diet chips
+    document.getElementById('settings-diet-veg').selected = profile.diet.includes('vegetarian');
+    document.getElementById('settings-diet-vegan').selected = profile.diet.includes('vegan');
+    document.getElementById('settings-diet-df').selected = profile.diet.includes('dairy-free');
+    document.getElementById('settings-diet-gf').selected = profile.diet.includes('gluten-free');
+    
+    // Select allergy chips
+    const allergyChips = settingsDialog.querySelectorAll('.settings-allergy-chip');
+    allergyChips.forEach(chip => {
+      chip.selected = profile.allergies.includes(chip.dataset.allergy);
+    });
+    
+    // Load API Key
+    const key = localStorage.getItem('gemini_api_key') || "";
+    inputApiKey.value = key;
   });
 
   btnSettingsCancel.addEventListener('click', () => {
@@ -98,13 +157,58 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   btnSettingsSave.addEventListener('click', () => {
+    // Validate inputs
+    const babyNameVal = document.getElementById('settings-baby-name').value.trim();
+    const babyAgeVal = parseInt(document.getElementById('settings-baby-age').value, 10) || 6;
+    const parentNameVal = document.getElementById('settings-parent-name').value.trim();
+    const parentRoleVal = document.getElementById('settings-parent-role').value || "Mom";
+    const countryVal = document.getElementById('settings-baby-country').value || "us";
+
+    if (!babyNameVal || !parentNameVal) {
+      alert("Please fill in both Baby's Name and Your Name.");
+      return;
+    }
+
+    // Read selected diets
+    const diet = [];
+    if (document.getElementById('settings-diet-veg').selected) diet.push('vegetarian');
+    if (document.getElementById('settings-diet-vegan').selected) diet.push('vegan');
+    if (document.getElementById('settings-diet-df').selected) diet.push('dairy-free');
+    if (document.getElementById('settings-diet-gf').selected) diet.push('gluten-free');
+
+    // Read selected allergies
+    const allergies = [];
+    const allergyChips = settingsDialog.querySelectorAll('.settings-allergy-chip');
+    allergyChips.forEach(chip => {
+      if (chip.selected) {
+        allergies.push(chip.dataset.allergy);
+      }
+    });
+
+    // Save profile state
+    const updatedProfile = {
+      name: babyNameVal,
+      age: babyAgeVal,
+      country: countryVal,
+      diet,
+      allergies,
+      parentName: parentNameVal,
+      parentRole: parentRoleVal
+    };
+    localStorage.setItem('todfeed_profile', JSON.stringify(updatedProfile));
+
+    // Save API key
     const key = inputApiKey.value.trim();
     if (key) {
       localStorage.setItem('gemini_api_key', key);
     } else {
       localStorage.removeItem('gemini_api_key');
     }
+
     settingsDialog.classList.remove('active');
+
+    // Call update handler to refresh other active views
+    handleProfileUpdated(updatedProfile);
   });
 
   // Close settings dialog when clicking the blurred background overlay
@@ -125,10 +229,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Helper to init specific panels
   const initializeHome = () => {
     renderHomePanel(panelHome, getActiveProfile, switchPanel);
-  };
-
-  const initializeProfile = () => {
-    renderProfilePanel(panelProfile, handleProfileUpdated);
   };
 
   const initializeRecipeGenerator = () => {
@@ -154,7 +254,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const switchPanel = (panelValue) => {
     const panels = {
       'home': panelHome,
-      'profile': panelProfile,
       'recipe': panelRecipe,
       'planner': panelPlanner,
       'safety': panelSafety
@@ -178,7 +277,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Lazy load panels on entry
     if (panelValue === 'home') initializeHome();
-    else if (panelValue === 'profile') initializeProfile();
     else if (panelValue === 'recipe') initializeRecipeGenerator();
     else if (panelValue === 'planner') initializePlanner();
     else if (panelValue === 'safety') initializeSafety();
@@ -200,7 +298,6 @@ document.addEventListener('DOMContentLoaded', () => {
       onboardingOverlay.classList.remove('active');
       // Re-initialize views with the newly set profile
       initializeHome();
-      initializeProfile();
       initializePlanner();
       initializeRecipeGenerator();
       initializeSafety();

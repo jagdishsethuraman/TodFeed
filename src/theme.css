@@ -1845,3 +1845,45 @@ md-tabs {
     padding: 16px 20px;
   }
 }
+
+/* Settings Dialog Tabs & Sections */
+.settings-tabs {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  border-bottom: 2px solid var(--color-border);
+  padding-bottom: 8px;
+}
+
+.settings-tab-btn {
+  background: none;
+  border: none;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--color-text-light);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 6px 12px;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+}
+
+.settings-tab-btn:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-primary-dark);
+}
+
+.settings-tab-btn.active {
+  color: var(--color-primary);
+  font-weight: 800;
+  background: none;
+}
+
+.settings-tab-content {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.settings-tab-content.active {
+  display: flex;
+}
