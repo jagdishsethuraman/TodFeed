@@ -57,11 +57,9 @@ export function renderPlannerPanel(container, getProfile) {
     container.innerHTML = `
       <div class="planner-header-actions">
         <div>
-          <h2 style="font-family: var(--font-heading); font-size: 22px; font-weight:700;">
-            ${profile.name}'s Feed Sheet
-          </h2>
-          <p style="font-size: 13px; color: var(--md-sys-color-secondary); font-weight: 500;">
-            Daily meal schedule for age ${profile.age}m (${profile.country.toUpperCase()})
+          <h2>${profile.name}'s Feed Sheet</h2>
+          <p style="font-size: 13px; color: var(--color-primary-dark); font-weight: 700;">
+            Daily feeding routine for age ${profile.age}m (${profile.country.toUpperCase()})
           </p>
         </div>
         
@@ -71,55 +69,56 @@ export function renderPlannerPanel(container, getProfile) {
         </button>
       </div>
 
-      <div class="schedule-slots-container">
+      <!-- Timeline Container -->
+      <div class="timeline-container">
         ${scheduleState.map((slot, idx) => `
-          <div class="card meal-slot-card ${slot.completed ? 'completed' : ''}" data-idx="${idx}">
-            <div class="meal-slot-header">
-              <span class="meal-slot-time">${slot.time}</span>
-              <span style="font-size: 12px; font-weight:600; text-transform: uppercase; color: var(--md-sys-color-secondary); letter-spacing:0.5px;">
-                ${slot.mealType}
+          <div class="timeline-item ${slot.completed ? 'completed' : ''}">
+            <!-- Timeline Node Indicator -->
+            <div class="timeline-dot">
+              <span class="material-symbols-rounded">
+                ${slot.isSolid ? 'restaurant' : 'child_care'}
               </span>
             </div>
 
-            <div>
-              <h3 class="meal-slot-title">${slot.title}</h3>
-              <p class="meal-slot-desc">${slot.desc}</p>
-            </div>
-
-            <div class="meal-slot-actions">
-              <!-- Checkbox to mark eaten status -->
-              <div class="flex-row-gap">
-                <md-checkbox 
-                  id="chk-slot-${idx}" 
-                  class="chk-meal-completed" 
-                  data-idx="${idx}"
-                  ${slot.completed ? 'checked' : ''}>
-                </md-checkbox>
-                <label for="chk-slot-${idx}" style="font-size: 13px; font-weight: 600; cursor: pointer; color: var(--md-sys-color-on-surface);">
-                  Mark Eaten
-                </label>
+            <!-- Card detailing the slot -->
+            <div class="card meal-slot-card ${slot.completed ? 'completed' : ''}" data-idx="${idx}">
+              <div class="meal-slot-header">
+                <span class="meal-slot-time">${slot.time}</span>
+                <span class="meal-slot-label">${slot.mealType}</span>
               </div>
 
-              <!-- Reaction logs for solids -->
-              ${slot.isSolid ? `
-                <div class="rating-container">
-                  <span class="rating-label">Reaction:</span>
-                  <div class="rating-buttons">
-                    <button class="rating-btn ${slot.reaction === 'disliked' ? 'active' : ''}" 
-                            data-reaction="disliked" data-idx="${idx}" title="Rejected/Spit Out">
-                      😠
-                    </button>
-                    <button class="rating-btn ${slot.reaction === 'some' ? 'active' : ''}" 
-                            data-reaction="some" data-idx="${idx}" title="Ate Some">
-                      😐
-                    </button>
-                    <button class="rating-btn ${slot.reaction === 'loved' ? 'active' : ''}" 
-                            data-reaction="loved" data-idx="${idx}" title="Eaten All/Loved">
-                      😊
-                    </button>
+              <div>
+                <h3 class="meal-slot-title">${slot.title}</h3>
+                <p class="meal-slot-desc">${slot.desc}</p>
+              </div>
+
+              <div class="meal-slot-actions">
+                <!-- Playful Button to Toggle Eaten Status -->
+                <button class="duo-btn duo-btn-outline btn-toggle-eaten ${slot.completed ? 'eaten' : ''}" data-idx="${idx}" type="button">
+                  ${slot.completed ? '✓ Eaten' : 'Mark Eaten'}
+                </button>
+
+                <!-- Reaction logs for solids (Disabled until Eaten is Checked) -->
+                ${slot.isSolid ? `
+                  <div class="rating-container ${slot.completed ? '' : 'disabled'}">
+                    <span class="rating-label">Reaction:</span>
+                    <div class="rating-buttons">
+                      <button class="rating-btn ${slot.reaction === 'disliked' ? 'active' : ''}" 
+                              data-reaction="disliked" data-idx="${idx}" title="Rejected/Spit Out" type="button">
+                        😠
+                      </button>
+                      <button class="rating-btn ${slot.reaction === 'some' ? 'active' : ''}" 
+                              data-reaction="some" data-idx="${idx}" title="Ate Some" type="button">
+                        😐
+                      </button>
+                      <button class="rating-btn ${slot.reaction === 'loved' ? 'active' : ''}" 
+                              data-reaction="loved" data-idx="${idx}" title="Eaten All/Loved" type="button">
+                        😊
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ` : ''}
+                ` : ''}
+              </div>
             </div>
           </div>
         `).join('')}
@@ -150,22 +149,20 @@ export function renderPlannerPanel(container, getProfile) {
       });
     }
 
-    // Checkbox eaten triggers
-    const checkBoxes = container.querySelectorAll('.chk-meal-completed');
-    checkBoxes.forEach(chk => {
-      chk.addEventListener('change', (e) => {
-        const idx = parseInt(e.target.dataset.idx, 10);
-        scheduleState[idx].completed = e.target.checked;
+    // Toggle eaten status button triggers
+    const toggleEatenBtns = container.querySelectorAll('.btn-toggle-eaten');
+    toggleEatenBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.idx, 10);
+        scheduleState[idx].completed = !scheduleState[idx].completed;
         
-        // Add visual transition class
-        const card = container.querySelector(`.meal-slot-card[data-idx="${idx}"]`);
-        if (e.target.checked) {
-          card.classList.add('completed');
-        } else {
-          card.classList.remove('completed');
+        // Reset reaction if marked not eaten
+        if (!scheduleState[idx].completed) {
+          scheduleState[idx].reaction = null;
         }
 
         saveScheduleState();
+        render(); // Re-render to update classes, icons, and disabled states
       });
     });
 

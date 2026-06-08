@@ -677,35 +677,129 @@ md-input-chip {
   margin-top: 20px;
 }
 
-/* Daily Planner Meal Slots */
+/* Daily Planner Timeline Layout */
 .planner-header-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+  background-color: var(--color-primary-light);
+  padding: 16px;
+  border-radius: var(--border-radius-sm);
+  border: 2px solid var(--color-primary);
 }
 
+.planner-header-actions h2 {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-primary-dark);
+}
+
+/* Timeline Track */
+.timeline-container {
+  position: relative;
+  padding-left: 40px;
+  margin-top: 24px;
+}
+
+.timeline-container::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 10px;
+  bottom: 10px;
+  width: 4px;
+  background-color: var(--color-border);
+  border-radius: 2px;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 28px;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -40px;
+  top: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--color-background);
+  border: 3px solid var(--color-border);
+  display: grid;
+  place-items: center;
+  z-index: 2;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 0 var(--color-border);
+}
+
+.timeline-item.completed .timeline-dot {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary-dark);
+  box-shadow: 0 4px 0 var(--color-primary-dark);
+}
+
+.timeline-dot .material-symbols-rounded {
+  font-size: 16px;
+  color: var(--color-text-light);
+}
+
+.timeline-item.completed .timeline-dot .material-symbols-rounded {
+  color: #ffffff;
+}
+
+/* Timeline Card Structure */
 .meal-slot-card {
-  border-left: 6px solid var(--color-primary);
+  border-left: 8px solid var(--color-border);
+  padding: 20px;
+  margin-bottom: 0px;
+  background-color: var(--color-card-bg);
+  transition: all 0.2s ease;
+  position: relative;
 }
 
 .meal-slot-card.completed {
-  border-left-color: var(--color-text-light);
-  opacity: 0.75;
+  border-left-color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+
+.meal-slot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .meal-slot-time {
   font-size: 11px;
   font-weight: 800;
-  color: #ffffff;
-  background-color: var(--color-primary-dark);
+  color: var(--color-text-dark);
+  background-color: var(--color-border);
   padding: 4px 10px;
-  border-radius: 8px;
+  border-radius: 10px;
   text-transform: uppercase;
 }
 
-.completed .meal-slot-time {
-  background-color: var(--color-text-light);
+.meal-slot-card.completed .meal-slot-time {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
+.meal-slot-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--color-text-light);
+  letter-spacing: 0.8px;
+}
+
+.meal-slot-card.completed .meal-slot-label {
+  color: var(--color-primary-dark);
 }
 
 .meal-slot-title {
@@ -713,41 +807,137 @@ md-input-chip {
   font-size: 18px;
   font-weight: 800;
   color: var(--color-text-dark);
-  margin-top: 6px;
+  margin-bottom: 6px;
 }
 
 .meal-slot-desc {
   font-size: 13px;
-  line-height: 1.45;
+  line-height: 1.5;
   color: var(--color-text);
   font-weight: 500;
+  margin-bottom: 16px;
 }
 
-/* Emojis Reaction Buttons */
+.meal-slot-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px dashed var(--color-border);
+  padding-top: 14px;
+  flex-wrap: wrap;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.meal-slot-card.completed .meal-slot-actions {
+  border-top-color: rgba(88, 204, 2, 0.3);
+}
+
+/* Eaten Toggle Button styling */
+.btn-toggle-eaten {
+  height: 40px;
+  padding: 0 16px;
+  font-size: 13px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  transition: all 0.1s ease;
+}
+
+.btn-toggle-eaten.eaten {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  box-shadow: 0 4px 0 var(--color-primary-dark);
+  border: none;
+}
+
+.btn-toggle-eaten.eaten:active {
+  top: 3px;
+  box-shadow: 0 1px 0 var(--color-primary-dark);
+}
+
+/* Reactions Panel */
+.rating-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+}
+
+.rating-label {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--color-text-light);
+}
+
+.meal-slot-card.completed .rating-label {
+  color: var(--color-primary-dark);
+}
+
+.rating-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+/* Playful reaction emojis button overrides */
 .rating-btn {
   background: var(--color-card-bg);
   border: 2px solid var(--color-border);
   border-bottom: 4px solid var(--color-border-dark);
   cursor: pointer;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
   display: grid;
   place-items: center;
   font-size: 20px;
-  transition: all 0.1s;
+  transition: all 0.1s ease;
+  position: relative;
+  top: 0;
 }
 
 .rating-btn:hover {
-  background-color: var(--color-primary-light);
-  border-color: var(--color-primary);
+  transform: scale(1.1);
+  background-color: var(--color-background);
 }
 
-.rating-btn.active {
-  background-color: var(--color-primary-light);
-  border-color: var(--color-primary);
+.rating-btn:active {
+  top: 2px;
   border-bottom-width: 2px;
-  transform: translateY(2px);
+}
+
+/* Active reaction highlights matching emoji tone */
+.rating-btn[data-reaction="disliked"].active {
+  background-color: var(--color-error-light) !important;
+  border-color: var(--color-error) !important;
+  box-shadow: 0 2px 0 var(--color-error-dark) !important;
+  top: 2px;
+  border-bottom-width: 2px;
+}
+
+.rating-btn[data-reaction="some"].active {
+  background-color: var(--color-yellow-light) !important;
+  border-color: var(--color-yellow) !important;
+  box-shadow: 0 2px 0 var(--color-yellow-dark) !important;
+  top: 2px;
+  border-bottom-width: 2px;
+}
+
+.rating-btn[data-reaction="loved"].active {
+  background-color: var(--color-primary-light) !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 2px 0 var(--color-primary-dark) !important;
+  top: 2px;
+  border-bottom-width: 2px;
+}
+
+/* Disable reactions until eaten */
+.rating-container.disabled {
+  opacity: 0.35;
+  pointer-events: none;
+  filter: grayscale(1);
 }
 
 /* Floating FAB */

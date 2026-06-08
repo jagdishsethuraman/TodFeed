@@ -62,6 +62,26 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
             </div>
           `).join('')}
         </div>
+        <!-- Custom Ingredient Input Field -->
+        <div style="background-color: var(--md-sys-color-surface-container-high); border: 2px dashed var(--color-border); border-radius: var(--border-radius-sm); padding: 16px; margin-bottom: 20px;">
+          <h3 style="font-family: var(--font-heading); font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-text-dark); margin-bottom: 8px;">
+            Add Custom Ingredient
+          </h3>
+          <p style="font-size: 12px; color: var(--color-text-light); margin-bottom: 12px;">
+            If your ingredient is not in the presets below, type it in and add it directly:
+          </p>
+          <div style="display: flex; gap: 10px; align-items: center; width: 100%;">
+            <md-outlined-text-field
+              id="input-custom-ingredient"
+              label="E.g., Quinoa, Salmon, Blueberries"
+              style="flex: 1;">
+            </md-outlined-text-field>
+            <button id="btn-add-custom-ingredient" class="duo-btn duo-btn-primary" style="height: 56px; border-radius: 16px; min-width: 80px;" type="button">
+              Add
+              <span class="material-symbols-rounded">add</span>
+            </button>
+          </div>
+        </div>
 
         <!-- Ingredient Picker Grid -->
         <div class="pantry-section">
@@ -113,6 +133,33 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
   }
 
   function setupEventListeners() {
+    // Custom ingredient adder
+    const addCustomBtn = container.querySelector('#btn-add-custom-ingredient');
+    const customInput = container.querySelector('#input-custom-ingredient');
+    if (addCustomBtn && customInput) {
+      const addCustom = () => {
+        const value = customInput.value.trim();
+        if (value) {
+          const formatted = value.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+          if (!selectedIngredients.includes(formatted)) {
+            selectedIngredients.push(formatted);
+            render();
+          } else {
+            alert(`"${formatted}" is already in your selected list!`);
+          }
+          customInput.value = '';
+        }
+      };
+
+      addCustomBtn.addEventListener('click', addCustom);
+      customInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addCustom();
+        }
+      });
+    }
+
     // Ingredient filter chips select
     const pantryChips = container.querySelectorAll('.pantry-chip');
     pantryChips.forEach(chip => {
