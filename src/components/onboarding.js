@@ -184,7 +184,7 @@ export function initializeOnboarding(overlayContainer, onComplete) {
                   style="width: 100%; height: 8px; border-radius: 4px; background: var(--color-border); accent-color: var(--color-primary); cursor: pointer; margin-top: 12px;"
                 />
               </div>
-              <div id="onboard-age-milestone" style="background: #ffffff; border: 2.5px solid var(--color-border); border-bottom-width: 5px; border-bottom-color: var(--color-border-dark); padding: 12px; border-radius: 12px; margin-top: 16px; font-size: 12px; line-height:1.4; text-align: left;">
+              <div id="onboard-age-milestone" style="background: var(--color-background); color: var(--color-text); border: 2.5px solid var(--color-border); border-bottom-width: 5px; border-bottom-color: var(--color-border-dark); padding: 12px; border-radius: 12px; margin-top: 16px; font-size: 12px; line-height:1.4; text-align: left;">
                 <!-- Filled dynamically by JS -->
               </div>
             </div>

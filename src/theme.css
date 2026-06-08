@@ -1742,15 +1742,14 @@ md-tabs {
 }
 
 .onboard-mascot-frame {
-  width: 96px;
-  height: 96px;
+  width: 80px;
+  height: 80px;
   position: relative;
-  border-radius: 20px;
-  border: 2px solid var(--color-border);
-  border-bottom: 5px solid var(--color-border-dark);
-  background: #ffffff;
+  border-radius: 18px;
   overflow: hidden;
   flex-shrink: 0;
+  justify-self: center;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
 }
 
 .onboard-mascot-sprite {
@@ -1763,10 +1762,10 @@ md-tabs {
   left: 0;
 }
 
-.sprite-q1 { background-position: 0 0; }
-.sprite-q2 { background-position: -96px 0; }
-.sprite-q3 { background-position: 0 -96px; }
-.sprite-q4 { background-position: -96px -96px; }
+.sprite-q1 { background-position: -14px -14px; }
+.sprite-q2 { background-position: -110px -14px; }
+.sprite-q3 { background-position: -14px -110px; }
+.sprite-q4 { background-position: -110px -110px; }
 
 .onboard-text-frame {
   display: flex;
