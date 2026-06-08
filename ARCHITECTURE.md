@@ -85,8 +85,9 @@ To guarantee the AI generator never breaks due to model deprecation or account-s
 ```javascript
 const modelsToTry = [
   'gemini-3.5-flash', // Default Stable Version
-  'gemini-3.1-pro',
   'gemini-2.5-flash',
+  'gemini-2.0-flash',
+  'gemini-3.1-flash-lite',
   'gemini-2.5-pro'
 ];
 ```
