@@ -25,6 +25,7 @@ import '@material/web/labs/navigationbar/navigation-bar.js';
 import '@material/web/labs/navigationtab/navigation-tab.js';
 
 // Import Modular Panel Renderers
+import { initializeOnboarding } from './components/onboarding.js';
 import { renderHomePanel } from './components/home.js';
 import { renderProfilePanel } from './components/profile.js';
 import { renderGeneratorPanel } from './components/generator.js';
@@ -45,6 +46,7 @@ function getActiveProfile() {
 
 // App Initialization
 document.addEventListener('DOMContentLoaded', () => {
+  const onboardingOverlay = document.getElementById('onboarding-overlay');
   const panelHome = document.getElementById('panel-home');
   const panelProfile = document.getElementById('panel-profile');
   const panelRecipe = document.getElementById('panel-recipe');
@@ -168,6 +170,22 @@ document.addEventListener('DOMContentLoaded', () => {
     switchPanel(selectedValue);
   });
 
-  // Initialize Default Starting Panel
-  switchPanel('home');
+  // Onboarding Logic Gate
+  const onboarded = localStorage.getItem('todfeed_onboarded') === 'true';
+  if (!onboarded && onboardingOverlay) {
+    onboardingOverlay.classList.add('active');
+    initializeOnboarding(onboardingOverlay, () => {
+      onboardingOverlay.classList.remove('active');
+      // Re-initialize views with the newly set profile
+      initializeHome();
+      initializeProfile();
+      initializePlanner();
+      initializeRecipeGenerator();
+      initializeSafety();
+      switchPanel('home');
+    });
+  } else {
+    if (onboardingOverlay) onboardingOverlay.classList.remove('active');
+    switchPanel('home');
+  }
 });
