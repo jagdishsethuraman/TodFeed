@@ -5,8 +5,8 @@ All notable changes to the **Todfeed** project will be documented in this file.
 ## [1.2.1] - 2026-06-08
 
 ### Fixed
-*   **Gemini Model Lineup:** Cleaned up the API fallback model chain. Removed retired `gemini-1.5-flash` and invalid `gemini-3.1-pro` models. Added stable backup models `gemini-2.0-flash` and `gemini-3.1-flash-lite` to bypass temporary 503 high demand spikes and free-tier 429 quota limits.
-*   **API Error Transparency:** Updated the AI engine to collect and report errors from all attempted models (`gemini-3.5-flash`, `gemini-2.5-flash`, `gemini-2.0-flash`, `gemini-3.1-flash-lite`, `gemini-2.5-pro`) upon complete fallback exhaustion, rather than only reporting the error of the last model.
+*   **Gemini Model Lineup:** Cleaned up the API fallback model chain. Removed retired `gemini-1.5-flash`, `gemini-3.1-pro`, `gemini-2.0-flash`, and `gemini-2.5-pro` models. Set `gemini-3.5-flash` as the default model, backed by `gemini-3.1-flash-lite` and `gemini-2.5-flash` to bypass temporary 503 high demand spikes and free-tier 429 quota limits.
+*   **API Error Transparency:** Updated the AI engine to collect and report errors from all attempted models (`gemini-3.5-flash`, `gemini-3.1-flash-lite`, `gemini-2.5-flash`) upon complete fallback exhaustion, rather than only reporting the error of the last model.
 
 ### Added
 *   **Caregiver Profiling & Greetings:** Added fields for the caregiver's name and role (Mom 👩, Dad 👨, Caregiver 🧑, Grandparent 👵) in both the first-time onboarding wizard and the Baby Profile settings panel, dynamically personalizing the Home Dashboard greeting (e.g., "Hi, Sarah!").
