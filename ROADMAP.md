@@ -32,6 +32,7 @@ gantt
 ### 2. Phase 2: Caregiver Sync & Cloud Integrations (Medium Term)
 *   **Firebase Firestore Sync:** Add optional Cloud Firestore database support. This allows parents to sync baby profiles and daily feed logs securely to the cloud.
 *   **Caregiver Sharing:** Let parents invite partners, grandparents, or nannies to view and check off meals from the same Daily Sheet in real-time.
+*   **Secure API Gateway & Google Sign-In:** Remove client-side API key inputs. Integrate Firebase Auth (Google Sign-In) and route all Gemini AI calls through a secure cloud function proxy (API Gateway) that handles rate limits and billing.
 *   **Offline First support:** Implement Service Workers and Workbox to enable a full Progressive Web App (PWA) experience, ensuring the app works perfectly in kitchens with poor Wi-Fi.
 
 ### 3. Phase 3: Android & iOS Mobile Release (Targeted)
