@@ -64,12 +64,33 @@
   --md-sys-color-error-container: var(--color-error-light);
   --md-sys-color-on-error-container: var(--color-error-dark);
 
-  /* Typography */
-  --md-sys-typescale-body-large-font: 'Plus Jakarta Sans', system-ui, sans-serif;
-  --md-sys-typescale-headline-large-font: 'Outfit', system-ui, sans-serif;
-
+  /* Typography & Font Families */
   --font-heading: 'Outfit', system-ui, sans-serif;
   --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+
+  /* Material Design 3 Typography System Tokens */
+  --md-ref-typeface-brand: var(--font-heading);
+  --md-ref-typeface-plain: var(--font-body);
+
+  --md-sys-typescale-display-large-font: var(--font-heading);
+  --md-sys-typescale-display-medium-font: var(--font-heading);
+  --md-sys-typescale-display-small-font: var(--font-heading);
+  
+  --md-sys-typescale-headline-large-font: var(--font-heading);
+  --md-sys-typescale-headline-medium-font: var(--font-heading);
+  --md-sys-typescale-headline-small-font: var(--font-heading);
+  
+  --md-sys-typescale-title-large-font: var(--font-heading);
+  --md-sys-typescale-title-medium-font: var(--font-heading);
+  --md-sys-typescale-title-small-font: var(--font-heading);
+  
+  --md-sys-typescale-body-large-font: var(--font-body);
+  --md-sys-typescale-body-medium-font: var(--font-body);
+  --md-sys-typescale-body-small-font: var(--font-body);
+  
+  --md-sys-typescale-label-large-font: var(--font-body);
+  --md-sys-typescale-label-medium-font: var(--font-body);
+  --md-sys-typescale-label-small-font: var(--font-body);
   --border-radius-sm: 16px;
   --border-radius-md: 20px;
   --border-radius-lg: 28px;
@@ -443,6 +464,28 @@ md-input-chip {
   border-radius: var(--border-radius-sm);
   padding: 16px;
   margin-top: 16px;
+}
+
+/* Generate Actions Layout (Responsive) */
+.generate-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.generate-actions .duo-btn {
+  width: 100%;
+}
+
+@media (min-width: 480px) {
+  .generate-actions {
+    flex-direction: row;
+  }
+  .generate-actions .duo-btn {
+    flex: 1;
+    width: auto;
+  }
 }
 
 .selected-ingredients-bar {

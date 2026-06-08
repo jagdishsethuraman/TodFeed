@@ -86,7 +86,7 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
         </div>
 
         <!-- Generator Actions -->
-        <div class="generate-actions" style="display: flex; gap: 12px;">
+        <div class="generate-actions">
           <button id="btn-match-local" class="duo-btn duo-btn-primary" type="button" ${selectedIngredients.length === 0 ? 'disabled' : ''}>
             Match Recipes
             <span class="material-symbols-rounded">menu_book</span>
@@ -94,7 +94,7 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
 
           <button id="btn-generate-ai" class="duo-btn duo-btn-tertiary" type="button" ${selectedIngredients.length === 0 ? 'disabled' : ''}>
             Generate with Gemini AI
-            <span class="material-symbols-rounded">temp_chef_apron</span>
+            <span class="material-symbols-rounded">auto_awesome</span>
           </button>
         </div>
 
