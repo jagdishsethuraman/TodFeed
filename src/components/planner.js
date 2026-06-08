@@ -1,6 +1,7 @@
 /* Todfeed - Daily Planner Component */
 
 import { generateDailyMealSheet } from '../utils/recipeEngine.js';
+import { triggerConfetti } from '../utils/confetti.js';
 
 export function renderPlannerPanel(container, getProfile) {
   let scheduleState = [];
@@ -154,11 +155,18 @@ export function renderPlannerPanel(container, getProfile) {
     toggleEatenBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         const idx = parseInt(btn.dataset.idx, 10);
+        const wasCompleted = scheduleState[idx].completed;
         scheduleState[idx].completed = !scheduleState[idx].completed;
         
         // Reset reaction if marked not eaten
         if (!scheduleState[idx].completed) {
           scheduleState[idx].reaction = null;
+        } else if (!wasCompleted) {
+          // Trigger confetti burst from button center
+          const rect = btn.getBoundingClientRect();
+          const centerX = rect.left + rect.width / 2;
+          const centerY = rect.top + rect.height / 2;
+          triggerConfetti(centerX, centerY, { particleCount: 50 });
         }
 
         saveScheduleState();
@@ -178,6 +186,13 @@ export function renderPlannerPanel(container, getProfile) {
           scheduleState[idx].reaction = null;
         } else {
           scheduleState[idx].reaction = reactionType;
+          // Trigger emoji confetti on loved rating!
+          if (reactionType === 'loved') {
+            const rect = btn.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            triggerConfetti(centerX, centerY, { particleCount: 25 });
+          }
         }
 
         saveScheduleState();

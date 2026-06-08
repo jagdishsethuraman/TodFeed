@@ -1,6 +1,7 @@
 /* Todfeed - Home Dashboard Component */
 
 import { generateDailyMealSheet } from '../utils/recipeEngine.js';
+import { triggerConfetti } from '../utils/confetti.js';
 
 export function renderHomePanel(container, getProfile, switchPanel) {
   let schedule = [];
@@ -37,6 +38,18 @@ export function renderHomePanel(container, getProfile, switchPanel) {
     const completedMeals = schedule.filter(s => s.completed).length;
     const progressPercent = totalMeals ? Math.round((completedMeals / totalMeals) * 100) : 0;
 
+    const babyAge = parseInt(profile.age, 10) || 6;
+    let ageGroup = 'active';
+    if (babyAge >= 4 && babyAge <= 6) {
+      ageGroup = 'baby';
+    } else if (babyAge >= 7 && babyAge <= 9) {
+      ageGroup = 'crawler';
+    } else if (babyAge >= 10 && babyAge <= 12) {
+      ageGroup = 'active';
+    } else {
+      ageGroup = 'toddler';
+    }
+
     // Get the first uncompleted meal
     const upcomingMealIndex = schedule.findIndex(s => !s.completed);
     const upcomingMeal = upcomingMealIndex !== -1 ? schedule[upcomingMealIndex] : null;
@@ -55,7 +68,7 @@ export function renderHomePanel(container, getProfile, switchPanel) {
               <span class="baby-badge">${profile.diet.length > 0 ? profile.diet.join(', ') : 'Standard Diet'}</span>
             </div>
           </div>
-          <div class="welcome-mascot-slot">
+          <div class="welcome-mascot-slot mascot-container age-${ageGroup}">
             <img src="/todfeed_mascot.png" class="welcome-mascot-img" alt="Winking Dino Mascot" />
           </div>
         </div>
@@ -191,12 +204,37 @@ export function renderHomePanel(container, getProfile, switchPanel) {
         const idx = parseInt(markEatenBtn.dataset.idx, 10);
         schedule[idx].completed = true;
         saveSchedule();
+        
+        // Trigger confetti burst from button center
+        const rect = markEatenBtn.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        triggerConfetti(centerX, centerY, { particleCount: 60 });
+
         render(); // Re-render in place
         
         // Notify other panels to refresh state if they are loaded
         if (window.refreshPlannerState) {
           window.refreshPlannerState();
         }
+      });
+    }
+
+    // Interactive Mascot click easter egg
+    const mascotImg = container.querySelector('.welcome-mascot-img');
+    if (mascotImg) {
+      mascotImg.addEventListener('click', () => {
+        if (mascotImg.classList.contains('jump-animation')) return;
+        mascotImg.classList.add('jump-animation');
+        
+        const rect = mascotImg.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        triggerConfetti(centerX, centerY, { particleCount: 20 });
+
+        setTimeout(() => {
+          mascotImg.classList.remove('jump-animation');
+        }, 600);
       });
     }
   }
