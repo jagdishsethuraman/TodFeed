@@ -415,25 +415,48 @@ Return ONLY a JSON object. Do not include markdown code block formatting (no \`\
   "nutritionBenefit": "..."
 }`;
 
-  try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const modelsToTry = [
+    'gemini-3.1-pro',
+    'gemini-3.1-flash',
+    'gemini-3.5-flash',
+    'gemini-2.5-flash',
+    'gemini-2.5-pro',
+    'gemini-2.0-flash',
+    'gemini-1.5-flash'
+  ];
 
-    const result = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: {
-        responseMimeType: 'application/json'
+  const genAI = new GoogleGenerativeAI(apiKey);
+  let lastError = null;
+
+  for (const modelName of modelsToTry) {
+    try {
+      console.log(`Attempting recipe generation with model: ${modelName}`);
+      const model = genAI.getGenerativeModel({ model: modelName });
+
+      const result = await model.generateContent({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
+          responseMimeType: 'application/json'
+        }
+      });
+
+      const responseText = result.response.text();
+      // Parse JSON safely
+      const cleanJson = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+      return JSON.parse(cleanJson);
+    } catch (error) {
+      console.warn(`Model ${modelName} failed:`, error);
+      lastError = error;
+      
+      // If the error message suggests a authentication or quota issue rather than "not found" (404),
+      // we could abort, but continuing to try other models ensures maximum resilience.
+      if (error.message && (error.message.includes("API key") || error.message.includes("invalid key") || error.message.includes("API_KEY_INVALID"))) {
+        throw new Error(`Invalid API Key: Please check your Gemini API Key in the settings dialog.`);
       }
-    });
-
-    const responseText = result.response.text();
-    // Parse JSON safely
-    const cleanJson = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-    return JSON.parse(cleanJson);
-  } catch (error) {
-    console.error("Gemini API Error:", error);
-    throw new Error(`Failed to generate recipe via Gemini: ${error.message || error}`);
+    }
   }
+
+  throw new Error(`Failed to generate recipe via Gemini. Checked models: [${modelsToTry.join(', ')}]. Last error: ${lastError?.message || lastError}`);
 }
 
 // Daily meal sheet planner generator based on baby profile and country
