@@ -30,8 +30,11 @@
 
       <!-- Main Panels Container -->
       <main class="app-main">
+        <!-- Home Dashboard Panel -->
+        <section id="panel-home" class="app-panel active"></section>
+
         <!-- Profile Panel -->
-        <section id="panel-profile" class="app-panel active"></section>
+        <section id="panel-profile" class="app-panel"></section>
 
         <!-- AI Recipe Panel -->
         <section id="panel-recipe" class="app-panel"></section>
@@ -46,7 +49,11 @@
       <!-- Bottom Navigation Bar -->
       <nav class="app-nav">
         <md-navigation-bar id="bottom-nav">
-          <md-navigation-tab label="Baby Profile" value="profile" active>
+          <md-navigation-tab label="Home" value="home" active>
+            <span slot="active-icon" class="material-symbols-rounded">home</span>
+            <span slot="inactive-icon" class="material-symbols-rounded">home</span>
+          </md-navigation-tab>
+          <md-navigation-tab label="Baby Profile" value="profile">
             <span slot="active-icon" class="material-symbols-rounded">child_care</span>
             <span slot="inactive-icon" class="material-symbols-rounded">child_care</span>
           </md-navigation-tab>

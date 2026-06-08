@@ -194,6 +194,9 @@ export function renderPlannerPanel(container, getProfile) {
     }
   }
 
+  // Expose renderer for dashboard sync
+  window.refreshPlannerState = render;
+
   // Initial render
   render();
 }

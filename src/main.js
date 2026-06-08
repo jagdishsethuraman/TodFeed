@@ -25,6 +25,7 @@ import '@material/web/labs/navigationbar/navigation-bar.js';
 import '@material/web/labs/navigationtab/navigation-tab.js';
 
 // Import Modular Panel Renderers
+import { renderHomePanel } from './components/home.js';
 import { renderProfilePanel } from './components/profile.js';
 import { renderGeneratorPanel } from './components/generator.js';
 import { renderPlannerPanel } from './components/planner.js';
@@ -44,6 +45,7 @@ function getActiveProfile() {
 
 // App Initialization
 document.addEventListener('DOMContentLoaded', () => {
+  const panelHome = document.getElementById('panel-home');
   const panelProfile = document.getElementById('panel-profile');
   const panelRecipe = document.getElementById('panel-recipe');
   const panelPlanner = document.getElementById('panel-planner');
@@ -90,12 +92,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Re-render panels on profile update
   const handleProfileUpdated = (updatedProfile) => {
-    // Regenerate planner and recipe views with new age settings
+    // Regenerate home, planner and recipe views with new age settings
+    initializeHome();
     initializePlanner();
     initializeRecipeGenerator();
   };
 
   // Helper to init specific panels
+  const initializeHome = () => {
+    renderHomePanel(panelHome, getActiveProfile, switchPanel);
+  };
+
   const initializeProfile = () => {
     renderProfilePanel(panelProfile, handleProfileUpdated);
   };
@@ -122,6 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Panel switching coordinator
   const switchPanel = (panelValue) => {
     const panels = {
+      'home': panelHome,
       'profile': panelProfile,
       'recipe': panelRecipe,
       'planner': panelPlanner,
@@ -145,7 +153,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Lazy load panels on entry
-    if (panelValue === 'profile') initializeProfile();
+    if (panelValue === 'home') initializeHome();
+    else if (panelValue === 'profile') initializeProfile();
     else if (panelValue === 'recipe') initializeRecipeGenerator();
     else if (panelValue === 'planner') initializePlanner();
     else if (panelValue === 'safety') initializeSafety();
@@ -160,5 +169,5 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Initialize Default Starting Panel
-  switchPanel('profile');
+  switchPanel('home');
 });
