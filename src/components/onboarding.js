@@ -1,6 +1,7 @@
 /* Todfeed - Onboarding Flow Component */
 
 import { generateDailyMealSheet } from '../utils/recipeEngine.js';
+import { saveScheduleToFirestore } from '../utils/firebaseSync.js';
 
 export function initializeOnboarding(overlayContainer, onComplete) {
   let currentSlide = 0; // 0 to 7
@@ -428,6 +429,9 @@ export function initializeOnboarding(overlayContainer, onComplete) {
     }));
     const scheduleKey = `todfeed_schedule_${babyName.replace(/\s+/g, '_')}`;
     localStorage.setItem(scheduleKey, JSON.stringify(scheduleState));
+
+    // Save schedule to Firestore
+    saveScheduleToFirestore(scheduleState);
 
     // Clear pantry list to default empty for this new child
     localStorage.removeItem('todfeed_pantry');

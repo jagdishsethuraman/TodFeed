@@ -2,6 +2,7 @@
 
 import { generateDailyMealSheet } from '../utils/recipeEngine.js';
 import { triggerConfetti } from '../utils/confetti.js';
+import { saveScheduleToFirestore } from '../utils/firebaseSync.js';
 
 export function renderHomePanel(container, getProfile, switchPanel) {
   let schedule = [];
@@ -21,6 +22,7 @@ export function renderHomePanel(container, getProfile, switchPanel) {
         reaction: null
       }));
       localStorage.setItem(storageKey, JSON.stringify(schedule));
+      saveScheduleToFirestore(schedule);
     }
   }
 
@@ -28,6 +30,7 @@ export function renderHomePanel(container, getProfile, switchPanel) {
     const profile = getProfile();
     const storageKey = `todfeed_schedule_${profile.name.replace(/\s+/g, '_')}`;
     localStorage.setItem(storageKey, JSON.stringify(schedule));
+    saveScheduleToFirestore(schedule);
   }
 
   function render() {

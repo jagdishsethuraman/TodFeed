@@ -1,6 +1,8 @@
 /* Todfeed - Smart Recipe & AI Engine */
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { functions } from '../firebase.js';
+import { httpsCallable } from 'firebase/functions';
 
 // Pre-seeded database of baby food recipes across different developmental ages and regions.
 export const LOCAL_RECIPES = [
@@ -387,7 +389,21 @@ export function matchLocalRecipes(selectedIngredients, profile) {
 export async function generateAiRecipe(selectedIngredients, profile) {
   const apiKey = localStorage.getItem('gemini_api_key');
   if (!apiKey) {
-    throw new Error("API key not found. Please click the settings icon in the top right to configure your Gemini API key.");
+    try {
+      console.log("No custom API key found. Routing generation through Cloud Function...");
+      const generateRecipeFn = httpsCallable(functions, 'generateRecipe');
+      const result = await generateRecipeFn({ selectedIngredients, profile });
+      
+      if (result.data && result.data.success) {
+        return result.data.recipe;
+      } else {
+        const errorMsg = result.data && result.data.message ? result.data.message : 'AI Recipe generation limit exceeded or failed.';
+        throw new Error(errorMsg);
+      }
+    } catch (error) {
+      console.error("Cloud Function call failed:", error);
+      throw new Error(error.message || "Failed to generate AI recipe via cloud helper.");
+    }
   }
 
   const { age, diet = [], allergies = [], country = "us" } = profile;
@@ -648,7 +664,21 @@ export function generateDailyMealSheet(profile) {
 export async function generateAiPairings(ingredient) {
   const apiKey = localStorage.getItem('gemini_api_key');
   if (!apiKey) {
-    throw new Error("Gemini API key not found. Configure it in Settings.");
+    try {
+      console.log("No custom API key found. Routing pairings generation through Cloud Function...");
+      const generatePairingsFn = httpsCallable(functions, 'generatePairings');
+      const result = await generatePairingsFn({ ingredient });
+      
+      if (result.data && result.data.success) {
+        return result.data.pairings;
+      } else {
+        const errorMsg = result.data && result.data.message ? result.data.message : 'AI pairings generation limit exceeded or failed.';
+        throw new Error(errorMsg);
+      }
+    } catch (error) {
+      console.error("Cloud Function call failed:", error);
+      throw new Error(error.message || "Failed to generate AI pairings via cloud helper.");
+    }
   }
 
   const prompt = `You are a pediatric nutritionist. For the food ingredient "${ingredient}", suggest 3 to 4 baby-safe ingredients/foods that it goes well with (food pairings) for a baby. For each pairing, explain why they match nutritionally or flavor-wise.

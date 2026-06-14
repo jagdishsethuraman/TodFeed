@@ -1,6 +1,7 @@
 /* Todfeed - Safety & Tips Component */
 
 import { generateAiPairings } from '../utils/recipeEngine.js';
+import { savePantryToFirestore } from '../utils/firebaseSync.js';
 
 export function renderSafetyPanel(container) {
   let activeTab = "weaning"; // "weaning", "choking", "allergens"
@@ -237,6 +238,7 @@ export function renderSafetyPanel(container) {
           if (!currentPantry.includes(ing)) {
             currentPantry.push(ing);
             localStorage.setItem('todfeed_pantry', JSON.stringify(currentPantry));
+            savePantryToFirestore(currentPantry);
             
             // Disable button and change label
             btn.textContent = '✓ Added';

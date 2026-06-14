@@ -31,6 +31,11 @@ import { renderGeneratorPanel } from './components/generator.js';
 import { renderPlannerPanel } from './components/planner.js';
 import { renderSafetyPanel } from './components/safety.js';
 
+// Import Firebase and Sync helpers
+import { auth, googleProvider } from './firebase.js';
+import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
+import { syncFromFirestore, saveProfileToFirestore, saveOnboardingStateToFirestore } from './utils/firebaseSync.js';
+
 // Global Profile Getter
 function getActiveProfile() {
   const stored = localStorage.getItem('todfeed_profile');
@@ -46,6 +51,8 @@ function getActiveProfile() {
 // App Initialization
 document.addEventListener('DOMContentLoaded', () => {
   const onboardingOverlay = document.getElementById('onboarding-overlay');
+  const authOverlay = document.getElementById('auth-overlay');
+  const btnGoogleSignin = document.getElementById('btn-google-signin');
   
   // Tab panels
   const panelHome = document.getElementById('panel-home');
@@ -59,6 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnSettingsCancel = document.getElementById('btn-settings-cancel');
   const btnSettingsSave = document.getElementById('btn-settings-save');
   const btnSettingsReset = document.getElementById('btn-settings-reset');
+  const btnSettingsLogout = document.getElementById('btn-settings-logout');
   const inputApiKey = document.getElementById('input-api-key');
 
   // Reset App / Onboarding trigger
@@ -197,6 +205,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     localStorage.setItem('todfeed_profile', JSON.stringify(updatedProfile));
 
+    // Sync profile to Firestore
+    saveProfileToFirestore(updatedProfile);
+
     // Save API key
     const key = inputApiKey.value.trim();
     if (key) {
@@ -290,21 +301,88 @@ document.addEventListener('DOMContentLoaded', () => {
     switchPanel(selectedValue);
   });
 
-  // Onboarding Logic Gate
-  const onboarded = localStorage.getItem('todfeed_onboarded') === 'true';
-  if (!onboarded && onboardingOverlay) {
-    onboardingOverlay.classList.add('active');
-    initializeOnboarding(onboardingOverlay, () => {
-      onboardingOverlay.classList.remove('active');
-      // Re-initialize views with the newly set profile
-      initializeHome();
-      initializePlanner();
-      initializeRecipeGenerator();
-      initializeSafety();
-      switchPanel('home');
+  // Google Sign-In click listener
+  if (btnGoogleSignin) {
+    btnGoogleSignin.addEventListener('click', async () => {
+      try {
+        btnGoogleSignin.disabled = true;
+        btnGoogleSignin.textContent = "Signing in...";
+        await signInWithPopup(auth, googleProvider);
+      } catch (error) {
+        console.error("Authentication failed:", error);
+        alert("Sign-in failed. Please try again.");
+        btnGoogleSignin.disabled = false;
+        btnGoogleSignin.innerHTML = `
+          <svg class="google-icon" viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+          </svg>
+          Sign in with Google
+        `;
+      }
     });
-  } else {
-    if (onboardingOverlay) onboardingOverlay.classList.remove('active');
-    switchPanel('home');
   }
+
+  // Logout button click listener
+  if (btnSettingsLogout) {
+    btnSettingsLogout.addEventListener('click', async () => {
+      if (confirm("Are you sure you want to sign out?")) {
+        settingsDialog.classList.remove('active');
+        await signOut(auth);
+      }
+    });
+  }
+
+  // Auth State Lifecycle Listener
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      console.log(`Authenticated as user: ${user.uid}`);
+      
+      // 1. Sync data from Firestore
+      await syncFromFirestore();
+      
+      // 2. Hide Auth Screen
+      if (authOverlay) authOverlay.classList.remove('active');
+
+      // 3. Routing: Onboarding vs Dashboard
+      const onboarded = localStorage.getItem('todfeed_onboarded') === 'true';
+      if (!onboarded && onboardingOverlay) {
+        onboardingOverlay.classList.add('active');
+        initializeOnboarding(onboardingOverlay, async () => {
+          // On onboarding complete, save profile/state to Firestore
+          const profile = getActiveProfile();
+          await saveProfileToFirestore(profile);
+          await saveOnboardingStateToFirestore(true);
+
+          onboardingOverlay.classList.remove('active');
+          initializeHome();
+          initializePlanner();
+          initializeRecipeGenerator();
+          initializeSafety();
+          switchPanel('home');
+        });
+      } else {
+        if (onboardingOverlay) onboardingOverlay.classList.remove('active');
+        initializeHome();
+        initializePlanner();
+        initializeRecipeGenerator();
+        initializeSafety();
+        switchPanel('home');
+      }
+    } else {
+      console.log("Unauthenticated state");
+      
+      // Clear LocalStorage except user's custom API key
+      const tempApiKey = localStorage.getItem('gemini_api_key');
+      localStorage.clear();
+      if (tempApiKey) {
+        localStorage.setItem('gemini_api_key', tempApiKey);
+      }
+
+      // Show Auth Screen
+      if (authOverlay) authOverlay.classList.add('active');
+    }
+  });
 });

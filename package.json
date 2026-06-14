@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
-    "@material/web": "^2.4.1"
+    "@material/web": "^2.4.1",
+    "firebase": "^11.3.0"
   }
 }

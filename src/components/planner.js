@@ -2,6 +2,7 @@
 
 import { generateDailyMealSheet } from '../utils/recipeEngine.js';
 import { triggerConfetti } from '../utils/confetti.js';
+import { saveScheduleToFirestore } from '../utils/firebaseSync.js';
 
 export function renderPlannerPanel(container, getProfile) {
   let scheduleState = [];
@@ -29,6 +30,7 @@ export function renderPlannerPanel(container, getProfile) {
     const profile = getProfile();
     const storageKey = `todfeed_schedule_${profile.name.replace(/\s+/g, '_')}`;
     localStorage.setItem(storageKey, JSON.stringify(scheduleState));
+    saveScheduleToFirestore(scheduleState);
   }
 
   // Exposed interface to add generated recipes

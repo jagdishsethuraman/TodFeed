@@ -1,12 +1,80 @@
 /* Todfeed - Recipe Generator Component */
 
 import { runSafetyChecks, matchLocalRecipes, generateAiRecipe } from '../utils/recipeEngine.js';
+import { savePantryToFirestore } from '../utils/firebaseSync.js';
+import { db, auth } from '../firebase.js';
+import { doc, getDoc } from 'firebase/firestore';
 
 export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner) {
   let selectedIngredients = JSON.parse(localStorage.getItem('todfeed_pantry') || '[]');
 
+  async function getRemainingGenerations() {
+    const user = auth.currentUser;
+    if (!user) return 0;
+    
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        const todayStr = new Date().toISOString().split('T')[0];
+        if (data.limits && data.limits.date === todayStr) {
+          return Math.max(0, 5 - data.limits.count);
+        }
+      }
+    } catch (e) {
+      console.error("Error reading daily limits:", e);
+    }
+    return 5; // Default free generations
+  }
+
+  async function updateCountdownUI() {
+    const indicator = container.querySelector('#ai-countdown-indicator');
+    const generateBtn = container.querySelector('#btn-generate-ai');
+    if (!indicator) return;
+
+    // Check if custom key exists
+    const customKey = localStorage.getItem('gemini_api_key');
+    if (customKey) {
+      indicator.innerHTML = `<span style="color: var(--color-primary);">★ Unlimited (using custom key)</span>`;
+      if (generateBtn && selectedIngredients.length > 0) {
+        generateBtn.disabled = false;
+      }
+      return;
+    }
+
+    // Otherwise, check Firestore daily limit
+    try {
+      const remaining = await getRemainingGenerations();
+      indicator.innerHTML = `${remaining} of 5 free generations remaining today`;
+      if (remaining === 0) {
+        indicator.innerHTML = `<span style="color: #ba1a1a; font-weight: 700;">0 of 5 free generations remaining. <a href="#" id="link-upgrade-settings" style="color: var(--color-primary); text-decoration: underline; font-weight: 800;">Add Gemini API key in Settings</a> for unlimited!</span>`;
+        
+        const settingsLink = indicator.querySelector('#link-upgrade-settings');
+        if (settingsLink) {
+          settingsLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (window.openSettings) {
+              window.openSettings('api');
+            } else {
+              document.querySelector('#settings-dialog').classList.add('active');
+            }
+          });
+        }
+
+        if (generateBtn) {
+          generateBtn.disabled = true;
+        }
+      }
+    } catch (e) {
+      console.error("Error updating countdown UI:", e);
+      indicator.textContent = "Error loading daily limit.";
+    }
+  }
+
   function savePantry() {
     localStorage.setItem('todfeed_pantry', JSON.stringify(selectedIngredients));
+    savePantryToFirestore(selectedIngredients);
   }
 
   let currentRecipeResult = null;
@@ -117,10 +185,15 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
             <span class="material-symbols-rounded">menu_book</span>
           </button>
 
-          <button id="btn-generate-ai" class="duo-btn duo-btn-tertiary" type="button" ${selectedIngredients.length === 0 ? 'disabled' : ''}>
-            Generate with Gemini AI
-            <span class="material-symbols-rounded">auto_awesome</span>
-          </button>
+          <div style="display: flex; flex-direction: column; gap: 4px; align-items: center; width: 100%;">
+            <button id="btn-generate-ai" class="duo-btn duo-btn-tertiary" type="button" ${selectedIngredients.length === 0 ? 'disabled' : ''}>
+              Generate with Gemini AI
+              <span class="material-symbols-rounded">auto_awesome</span>
+            </button>
+            <div id="ai-countdown-indicator" style="font-size: 12px; font-weight: 700; color: var(--color-text-light); margin-top: 4px; text-align: center;">
+              Checking remaining free generations...
+            </div>
+          </div>
         </div>
 
         <!-- Loading Spinner Container -->
@@ -135,6 +208,7 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
     `;
 
     setupEventListeners();
+    updateCountdownUI();
   }
 
   function setupEventListeners() {
@@ -253,6 +327,7 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
         } finally {
           loader.style.display = 'none';
           generateAiBtn.disabled = false;
+          updateCountdownUI();
         }
       });
     }
