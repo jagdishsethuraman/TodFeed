@@ -1952,23 +1952,26 @@ md-tabs {
 }
 
 .auth-mascot-frame {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  background-color: var(--color-primary-light);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 100px;
+  height: 100px;
+  border-radius: 24px; /* Playful squircle matching Duolingo style */
+  background-color: #f9e280; /* Yellow background matching the dino sprite */
+  position: relative;
   border: 4px solid var(--color-primary);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
   overflow: hidden;
   animation: auth-mascot-bounce 3s ease-in-out infinite alternate;
 }
 
-.auth-mascot {
-  width: 80px;
-  height: 80px;
-  object-fit: contain;
+.auth-mascot-sprite {
+  width: 260px; /* Scaled up to fit the 100px frame */
+  height: 260px;
+  background-image: url('/todfeed_dino_spoon_variations.png');
+  background-size: 260px 260px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-position: -15px -145px; /* Quadrant 3 center position */
 }
 
 .auth-title {
