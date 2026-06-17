@@ -4,7 +4,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 admin.initializeApp();
 
-exports.generateRecipe = onCall({ cors: true }, async (request) => {
+exports.generateRecipe = onCall({ cors: true, secrets: ["GEMINI_API_KEY"] }, async (request) => {
   // 1. Check Auth
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
@@ -145,7 +145,7 @@ Return ONLY a JSON object. Do not include markdown code block formatting (no \`\
   throw new HttpsError("internal", `AI Recipe generation failed: ${lastError ? lastError.message : "unknown error"}`);
 });
 
-exports.generatePairings = onCall({ cors: true }, async (request) => {
+exports.generatePairings = onCall({ cors: true, secrets: ["GEMINI_API_KEY"] }, async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
   }
