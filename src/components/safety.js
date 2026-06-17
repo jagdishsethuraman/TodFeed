@@ -163,15 +163,48 @@ export function renderSafetyPanel(container) {
     }
 
     const apiKey = localStorage.getItem('gemini_api_key');
-    if (!apiKey) {
+    if (!apiKey && !aiPairingsResult) {
       pairingsContainer.innerHTML = `
-        <div class="ai-pairings-promo" style="display: flex; align-items: center; gap: 8px; background-color: var(--color-bg); border: 2px dashed var(--color-border); padding: 12px 16px; border-radius: 12px; margin-top: 12px;">
-          <span class="material-symbols-rounded" style="color: var(--color-primary); font-size: 20px;">auto_awesome</span>
-          <p style="font-size: 12px; color: var(--color-text-dark); margin: 0; line-height: 1.4; text-align: left;">
-            <strong>Want to see what else goes with this?</strong> Enter your Gemini API key in settings to unlock AI-powered food pairings!
+        <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <button id="btn-get-ai-pairings" class="duo-btn duo-btn-outline" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; font-size: 13px; font-weight: 700; border-color: var(--color-primary); color: var(--color-primary);">
+            <span class="material-symbols-rounded" style="font-size: 18px;">auto_awesome</span>
+            Suggest Food Pairings (Uses 1 daily credit)
+          </button>
+          <p style="font-size: 11px; color: var(--color-text-light); text-align: center; margin: 0;">
+            Want unlimited suggestions? Enter your own Gemini API key in <a href="#" id="link-safety-settings" style="color: var(--color-primary); text-decoration: underline;">Settings</a>.
           </p>
         </div>
       `;
+
+      const getPairingsBtn = pairingsContainer.querySelector('#btn-get-ai-pairings');
+      if (getPairingsBtn) {
+        getPairingsBtn.addEventListener('click', () => {
+          const query = container.querySelector('#input-hazard-search').value.toLowerCase().trim();
+          if (!query) return;
+
+          aiPairingsResult = 'loading';
+          renderPairingsArea();
+
+          generateAiPairings(query)
+            .then(result => {
+              aiPairingsResult = result;
+              renderPairingsArea();
+            })
+            .catch(err => {
+              aiPairingsResult = { error: err.message };
+              renderPairingsArea();
+            });
+        });
+      }
+
+      const settingsLink = pairingsContainer.querySelector('#link-safety-settings');
+      if (settingsLink) {
+        settingsLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          const settingsBtn = document.querySelector('#btn-settings');
+          if (settingsBtn) settingsBtn.click();
+        });
+      }
       return;
     }
 
