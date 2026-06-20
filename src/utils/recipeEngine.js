@@ -387,7 +387,7 @@ export function matchLocalRecipes(selectedIngredients, profile) {
 
 // Gemini AI Recipe Generator Integration
 export async function generateAiRecipe(selectedIngredients, profile) {
-  const apiKey = localStorage.getItem('gemini_api_key');
+  const apiKey = sessionStorage.getItem('gemini_api_key');
   if (!apiKey) {
     try {
       console.log("No custom API key found. Routing generation through Cloud Function...");
@@ -662,7 +662,7 @@ export function generateDailyMealSheet(profile) {
 
 // Gemini AI Food Pairings Generator
 export async function generateAiPairings(ingredient) {
-  const apiKey = localStorage.getItem('gemini_api_key');
+  const apiKey = sessionStorage.getItem('gemini_api_key');
   if (!apiKey) {
     try {
       console.log("No custom API key found. Routing pairings generation through Cloud Function...");

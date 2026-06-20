@@ -1,5 +1,7 @@
 /* Todfeed - Daily Planner Component */
 
+import { escapeHtml } from '../utils/sanitize.js';
+
 import { generateDailyMealSheet } from '../utils/recipeEngine.js';
 import { triggerConfetti } from '../utils/confetti.js';
 import { saveScheduleToFirestore } from '../utils/firebaseSync.js';
@@ -60,9 +62,9 @@ export function renderPlannerPanel(container, getProfile) {
     container.innerHTML = `
       <div class="planner-header-actions">
         <div>
-          <h2>${profile.name}'s Feed Sheet</h2>
+          <h2>${escapeHtml(profile.name)}'s Feed Sheet</h2>
           <p style="font-size: 13px; color: var(--color-primary-dark); font-weight: 700;">
-            Daily feeding routine for age ${profile.age}m (${profile.country.toUpperCase()})
+            Daily feeding routine for age ${escapeHtml(profile.age)}m (${escapeHtml(profile.country.toUpperCase())})
           </p>
         </div>
         
@@ -86,13 +88,13 @@ export function renderPlannerPanel(container, getProfile) {
             <!-- Card detailing the slot -->
             <div class="card meal-slot-card ${slot.completed ? 'completed' : ''}" data-idx="${idx}">
               <div class="meal-slot-header">
-                <span class="meal-slot-time">${slot.time}</span>
-                <span class="meal-slot-label">${slot.mealType}</span>
+                <span class="meal-slot-time">${escapeHtml(slot.time)}</span>
+                <span class="meal-slot-label">${escapeHtml(slot.mealType)}</span>
               </div>
 
               <div>
-                <h3 class="meal-slot-title">${slot.title}</h3>
-                <p class="meal-slot-desc">${slot.desc}</p>
+                <h3 class="meal-slot-title">${escapeHtml(slot.title)}</h3>
+                <p class="meal-slot-desc">${escapeHtml(slot.desc)}</p>
               </div>
 
               <div class="meal-slot-actions">

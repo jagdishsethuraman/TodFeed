@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // Load API Key
-    const key = localStorage.getItem('gemini_api_key') || "";
+    const key = sessionStorage.getItem('gemini_api_key') || "";
     inputApiKey.value = key;
   });
 
@@ -211,9 +211,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Save API key
     const key = inputApiKey.value.trim();
     if (key) {
-      localStorage.setItem('gemini_api_key', key);
+      sessionStorage.setItem('gemini_api_key', key);
     } else {
-      localStorage.removeItem('gemini_api_key');
+      sessionStorage.removeItem('gemini_api_key');
     }
 
     settingsDialog.classList.remove('active');
@@ -388,12 +388,8 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       }
       
-      // Clear LocalStorage except user's custom API key
-      const tempApiKey = localStorage.getItem('gemini_api_key');
+      // Clear LocalStorage
       localStorage.clear();
-      if (tempApiKey) {
-        localStorage.setItem('gemini_api_key', tempApiKey);
-      }
 
       // Show Auth Screen
       if (authOverlay) authOverlay.classList.add('active');

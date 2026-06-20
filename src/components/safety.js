@@ -1,5 +1,7 @@
 /* Todfeed - Safety & Tips Component */
 
+import { escapeHtml, escapeAttr } from '../utils/sanitize.js';
+
 import { generateAiPairings } from '../utils/recipeEngine.js';
 import { savePantryToFirestore } from '../utils/firebaseSync.js';
 
@@ -123,9 +125,9 @@ export function renderSafetyPanel(container) {
               </div>
               <div class="safety-info">
                 <h3 style="color: ${checkerResult.status === 'red' ? 'var(--md-sys-color-error)' : 'var(--md-sys-color-primary)'}">
-                  ${checkerResult.title}
+                  ${escapeHtml(checkerResult.title)}
                 </h3>
-                <p>${checkerResult.desc}</p>
+                <p>${escapeHtml(checkerResult.desc)}</p>
               </div>
             </div>
           ` : ''}
@@ -162,7 +164,7 @@ export function renderSafetyPanel(container) {
       return;
     }
 
-    const apiKey = localStorage.getItem('gemini_api_key');
+    const apiKey = sessionStorage.getItem('gemini_api_key');
     if (!apiKey && !aiPairingsResult) {
       pairingsContainer.innerHTML = `
         <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
@@ -224,7 +226,7 @@ export function renderSafetyPanel(container) {
       pairingsContainer.innerHTML = `
         <div style="color: var(--md-sys-color-error); font-size: 12px; margin-top: 12px; display: flex; align-items: center; gap: 6px; background: #fff1f1; border: 1.5px solid #ffcccc; padding: 10px; border-radius: 10px;">
           <span class="material-symbols-rounded" style="font-size: 16px;">error</span>
-          <span style="text-align: left;">Failed to fetch pairings: ${aiPairingsResult.error}</span>
+          <span style="text-align: left;">Failed to fetch pairings: ${escapeHtml(aiPairingsResult.error)}</span>
         </div>
       `;
       return;
@@ -235,7 +237,7 @@ export function renderSafetyPanel(container) {
         <div class="card ai-pairings-result-card" style="border: 2px solid var(--color-primary-light); border-bottom-width: 6px; border-bottom-color: var(--color-primary-dark); background-color: var(--color-bg); margin-top: 12px; padding: 16px;">
           <h4 style="font-family: var(--font-heading); font-size: 14px; font-weight: 800; color: var(--color-primary-dark); display: flex; align-items: center; gap: 6px; margin: 0 0 12px 0; text-align: left;">
             <span class="material-symbols-rounded" style="font-size: 18px; color: var(--color-primary);">auto_awesome</span>
-            Dino's Kitchen Matches: What goes with "${aiPairingsResult.ingredient}"?
+            Dino's Kitchen Matches: What goes with "${escapeHtml(aiPairingsResult.ingredient)}"?
           </h4>
           <div style="display: flex; flex-direction: column; gap: 10px;">
             ${aiPairingsResult.pairings.map(pair => {
@@ -244,10 +246,10 @@ export function renderSafetyPanel(container) {
               return `
                 <div style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; border: 1.5px solid var(--color-border); border-bottom: 3.5px solid var(--color-border-dark); padding: 10px 14px; border-radius: 12px; gap: 10px;">
                   <div style="flex: 1; text-align: left;">
-                    <strong style="color: var(--color-text-dark); font-size: 13px;">${pair.name}</strong>
-                    <p style="font-size: 12px; color: var(--color-text-light); margin: 2px 0 0 0; line-height: 1.3;">${pair.reason}</p>
+                    <strong style="color: var(--color-text-dark); font-size: 13px;">${escapeHtml(pair.name)}</strong>
+                    <p style="font-size: 12px; color: var(--color-text-light); margin: 2px 0 0 0; line-height: 1.3;">${escapeHtml(pair.reason)}</p>
                   </div>
-                  <button class="duo-btn duo-btn-outline btn-add-pairing-to-pantry" data-ing="${pair.name}" style="height: 32px; padding: 0 10px; font-size: 11px; border-radius: 8px; flex-shrink: 0;" type="button" ${alreadyAdded ? 'disabled' : ''}>
+                  <button class="duo-btn duo-btn-outline btn-add-pairing-to-pantry" data-ing="${escapeAttr(pair.name)}" style="height: 32px; padding: 0 10px; font-size: 11px; border-radius: 8px; flex-shrink: 0;" type="button" ${alreadyAdded ? 'disabled' : ''}>
                     ${alreadyAdded ? '✓ Added' : '+ Pantry'}
                   </button>
                 </div>
@@ -256,7 +258,7 @@ export function renderSafetyPanel(container) {
           </div>
           ${aiPairingsResult.tips ? `
             <p style="font-size: 12px; color: var(--color-text-dark); line-height: 1.4; margin: 12px 0 0 0; font-style: italic; text-align: left;">
-              <strong>Dino's Prep Tip:</strong> ${aiPairingsResult.tips}
+              <strong>Dino's Prep Tip:</strong> ${escapeHtml(aiPairingsResult.tips)}
             </p>
           ` : ''}
         </div>
@@ -425,7 +427,7 @@ export function renderSafetyPanel(container) {
         } else {
           checkerResult = {
             status: "green",
-            title: `${query.charAt(0).toUpperCase() + query.slice(1)} is generally safe`,
+            title: `${escapeHtml(query.charAt(0).toUpperCase() + query.slice(1))} is generally safe`,
             desc: "This ingredient is not flagged as a primary high-risk choking hazard or allergen. Prepare to an age-appropriate texture (pureed or soft fingers) and enjoy!"
           };
         }
@@ -434,7 +436,7 @@ export function renderSafetyPanel(container) {
         aiPairingsResult = null;
         render();
 
-        const apiKey = localStorage.getItem('gemini_api_key');
+        const apiKey = sessionStorage.getItem('gemini_api_key');
         if (apiKey) {
           aiPairingsResult = 'loading';
           renderPairingsArea();

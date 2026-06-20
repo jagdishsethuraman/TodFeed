@@ -4,7 +4,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 admin.initializeApp();
 
-exports.generateRecipe = onCall({ cors: true, secrets: ["GEMINI_API_KEY"] }, async (request) => {
+exports.generateRecipe = onCall({ cors: ["https://todfeed-app-61326.web.app", "https://todfeed-app-61326.firebaseapp.com", "http://localhost:8080"], secrets: ["GEMINI_API_KEY"] }, async (request) => {
   // 1. Check Auth
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
@@ -13,43 +13,51 @@ exports.generateRecipe = onCall({ cors: true, secrets: ["GEMINI_API_KEY"] }, asy
   const uid = request.auth.uid;
   const { selectedIngredients, profile } = request.data || {};
 
-  if (!selectedIngredients || !profile) {
-    throw new HttpsError("invalid-argument", "Missing selectedIngredients or profile.");
+  if (!Array.isArray(selectedIngredients) || selectedIngredients.length === 0 || selectedIngredients.length > 20) {
+    throw new HttpsError("invalid-argument", "selectedIngredients must be an array of 1-20 items.");
+  }
+  if (!selectedIngredients.every(i => typeof i === 'string' && i.length > 0 && i.length <= 100)) {
+    throw new HttpsError("invalid-argument", "Each ingredient must be a non-empty string under 100 characters.");
+  }
+  if (!profile || typeof profile !== 'object') {
+    throw new HttpsError("invalid-argument", "Missing or invalid profile.");
+  }
+  const age = typeof profile.age === 'number' ? profile.age : parseInt(profile.age, 10);
+  if (isNaN(age) || age < 1 || age > 60) {
+    throw new HttpsError("invalid-argument", "Age must be a number between 1 and 60.");
   }
 
   // 2. Daily limits enforcement in Firestore
   const todayStr = new Date().toISOString().split("T")[0];
-  const userRef = admin.firestore().collection("users").doc(uid);
+  const limitsRef = admin.firestore().collection("rate_limits").doc(uid);
 
   let limitReached = false;
   let remaining = 5;
 
   await admin.firestore().runTransaction(async (transaction) => {
-    const userDoc = await transaction.get(userRef);
+    const userDoc = await transaction.get(limitsRef);
     let userData = {};
     if (userDoc.exists) {
       userData = userDoc.data();
     }
 
-    let limits = userData.limits || {};
-
-    if (limits.date !== todayStr) {
+    if (userData.date !== todayStr) {
       // It's a new day, reset count to 1
-      limits = { date: todayStr, count: 1 };
+      userData = { date: todayStr, count: 1 };
     } else {
       // Same day, check limit
-      if (limits.count >= 5) {
+      if (userData.count >= 5) {
         limitReached = true;
         remaining = 0;
         return;
       }
-      limits.count += 1;
+      userData.count += 1;
     }
 
-    remaining = Math.max(0, 5 - limits.count);
+    remaining = Math.max(0, 5 - userData.count);
 
-    // Save limits inside user document
-    transaction.set(userRef, { limits }, { merge: true });
+    // Save limits in rate_limits collection (server-only writes)
+    transaction.set(limitsRef, { date: userData.date, count: userData.count });
   });
 
   if (limitReached) {
@@ -142,10 +150,10 @@ Return ONLY a JSON object. Do not include markdown code block formatting (no \`\
     console.error("Fallback generation failed:", err);
   }
 
-  throw new HttpsError("internal", `AI Recipe generation failed: ${lastError ? lastError.message : "unknown error"}`);
+  throw new HttpsError("internal", "AI recipe generation failed. Please try again later.");
 });
 
-exports.generatePairings = onCall({ cors: true, secrets: ["GEMINI_API_KEY"] }, async (request) => {
+exports.generatePairings = onCall({ cors: ["https://todfeed-app-61326.web.app", "https://todfeed-app-61326.firebaseapp.com", "http://localhost:8080"], secrets: ["GEMINI_API_KEY"] }, async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
   }
@@ -153,39 +161,37 @@ exports.generatePairings = onCall({ cors: true, secrets: ["GEMINI_API_KEY"] }, a
   const uid = request.auth.uid;
   const { ingredient } = request.data || {};
 
-  if (!ingredient) {
-    throw new HttpsError("invalid-argument", "Missing ingredient.");
+  if (!ingredient || typeof ingredient !== 'string' || ingredient.trim().length === 0 || ingredient.length > 100) {
+    throw new HttpsError("invalid-argument", "Ingredient must be a non-empty string under 100 characters.");
   }
 
   // Check limits
   const todayStr = new Date().toISOString().split("T")[0];
-  const userRef = admin.firestore().collection("users").doc(uid);
+  const limitsRef = admin.firestore().collection("rate_limits").doc(uid);
 
   let limitReached = false;
   let remaining = 5;
 
   await admin.firestore().runTransaction(async (transaction) => {
-    const userDoc = await transaction.get(userRef);
+    const userDoc = await transaction.get(limitsRef);
     let userData = {};
     if (userDoc.exists) {
       userData = userDoc.data();
     }
 
-    let limits = userData.limits || {};
-
-    if (limits.date !== todayStr) {
-      limits = { date: todayStr, count: 1 };
+    if (userData.date !== todayStr) {
+      userData = { date: todayStr, count: 1 };
     } else {
-      if (limits.count >= 5) {
+      if (userData.count >= 5) {
         limitReached = true;
         remaining = 0;
         return;
       }
-      limits.count += 1;
+      userData.count += 1;
     }
 
-    remaining = Math.max(0, 5 - limits.count);
-    transaction.set(userRef, { limits }, { merge: true });
+    remaining = Math.max(0, 5 - userData.count);
+    transaction.set(limitsRef, { date: userData.date, count: userData.count });
   });
 
   if (limitReached) {
@@ -264,5 +270,5 @@ Return ONLY a JSON object. Do not include markdown code block formatting (no \`\
     console.error("Fallback pairings failed:", err);
   }
 
-  throw new HttpsError("internal", `AI Pairings generation failed: ${lastError ? lastError.message : "unknown error"}`);
+  throw new HttpsError("internal", "AI food pairings generation failed. Please try again later.");
 });

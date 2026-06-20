@@ -25,4 +25,11 @@ dist-ssr
 scratch/
 .firebase/
 
-
+# Environment & secret files
+.env
+.env.*
+.env.local
+.env.production
+.secret.local
+functions/.env
+functions/.secret.local

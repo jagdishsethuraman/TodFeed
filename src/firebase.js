@@ -2,7 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getFunctions } from 'firebase/functions';
-import { getAnalytics } from 'firebase/analytics';
+import { getAnalytics, isSupported } from 'firebase/analytics';
 
 const firebaseConfig = {
   apiKey: "AIzaSyBEDXyQzVaK_tcbnGFBeoFIPDkH8K381CI",
@@ -18,5 +18,12 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const functions = getFunctions(app);
-export const analytics = getAnalytics(app);
+export let analytics = null;
+isSupported().then((supported) => {
+  if (supported) {
+    analytics = getAnalytics(app);
+  }
+}).catch((err) => {
+  console.warn("Firebase Analytics is not supported in this environment:", err);
+});
 export const googleProvider = new GoogleAuthProvider();

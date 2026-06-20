@@ -1,5 +1,7 @@
 /* Todfeed - Recipe Generator Component */
 
+import { escapeHtml, escapeAttr } from '../utils/sanitize.js';
+
 import { runSafetyChecks, matchLocalRecipes, generateAiRecipe } from '../utils/recipeEngine.js';
 import { savePantryToFirestore } from '../utils/firebaseSync.js';
 import { db, auth } from '../firebase.js';
@@ -13,13 +15,13 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
     if (!user) return 0;
     
     try {
-      const userRef = doc(db, 'users', user.uid);
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists()) {
-        const data = userSnap.data();
+      const limitsRef = doc(db, 'rate_limits', user.uid);
+      const limitsSnap = await getDoc(limitsRef);
+      if (limitsSnap.exists()) {
+        const data = limitsSnap.data();
         const todayStr = new Date().toISOString().split('T')[0];
-        if (data.limits && data.limits.date === todayStr) {
-          return Math.max(0, 5 - data.limits.count);
+        if (data.date === todayStr) {
+          return Math.max(0, 5 - data.count);
         }
       }
     } catch (e) {
@@ -34,7 +36,7 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
     if (!indicator) return;
 
     // Check if custom key exists
-    const customKey = localStorage.getItem('gemini_api_key');
+    const customKey = sessionStorage.getItem('gemini_api_key');
     if (customKey) {
       indicator.innerHTML = `<span style="color: var(--color-primary);">★ Unlimited (using custom key)</span>`;
       if (generateBtn && selectedIngredients.length > 0) {
@@ -107,7 +109,7 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
             ${selectedIngredients.length === 0 
               ? `<span style="font-size: 13px; color: var(--md-sys-color-on-surface-variant); font-style: italic;">No ingredients selected yet. Select from the categories below!</span>`
               : selectedIngredients.map(ing => `
-                  <md-input-chip label="${ing}" remove-only class="active-ingredient-chip" data-ing="${ing}">
+                  <md-input-chip label="${escapeAttr(ing)}" remove-only class="active-ingredient-chip" data-ing="${escapeAttr(ing)}">
                   </md-input-chip>
                 `).join('')
             }
@@ -129,8 +131,8 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
                 ${warn.type === 'DANGER' ? 'report' : 'warning'}
               </span>
               <div class="content">
-                <h4>${warn.title}</h4>
-                <p>${warn.message}</p>
+                <h4>${escapeHtml(warn.title)}</h4>
+                <p>${escapeHtml(warn.message)}</p>
               </div>
             </div>
           `).join('')}
@@ -161,15 +163,15 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
           ${Object.entries(categories).map(([catName, items]) => `
             <div class="category-group" style="margin-bottom: 16px;">
               <h3 style="font-size: 13px; font-weight:600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--md-sys-color-secondary); margin-bottom: 8px;">
-                ${catName}
+                ${escapeHtml(catName)}
               </h3>
               <div class="ingredient-chips-grid">
                 ${items.map(item => {
                   const isSelected = selectedIngredients.includes(item);
                   return `<md-filter-chip 
                             class="pantry-chip" 
-                            label="${item}" 
-                            data-ing="${item}"
+                            label="${escapeAttr(item)}" 
+                            data-ing="${escapeAttr(item)}"
                             ${isSelected ? 'selected' : ''}>
                           </md-filter-chip>`;
                 }).join('')}
@@ -310,7 +312,7 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
                 <h3>AI Generation Failed</h3>
               </div>
               <p style="font-size: 14px; line-height: 1.5; margin-bottom: 16px;">
-                ${err.message}
+                ${escapeHtml(err.message)}
               </p>
               <button id="btn-open-settings-err" class="duo-btn duo-btn-primary" type="button">
                 Open Settings
@@ -395,7 +397,7 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
         <div class="recipe-header">
           <div style="display: flex; justify-content: space-between; align-items: flex-start;">
             <div>
-              <h3>${recipe.recipeName}</h3>
+              <h3>${escapeHtml(recipe.recipeName)}</h3>
               <p style="font-size: 12px; color: var(--md-sys-color-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
                 ${isAiGenerated ? '★ Live Gemini AI Recommendation' : 'Local Approved Recipe'}
               </p>
@@ -407,11 +409,11 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
           <div class="recipe-meta-row" style="margin-top: 12px;">
             <div class="recipe-meta-item">
               <span class="material-symbols-rounded">texture</span>
-              <span>Texture: ${recipe.texture || 'Puree'}</span>
+              <span>Texture: ${escapeHtml(recipe.texture || 'Puree')}</span>
             </div>
             <div class="recipe-meta-item">
               <span class="material-symbols-rounded">schedule</span>
-              <span>Prep: ${recipe.prepTime || '5m'} | Cook: ${recipe.cookTime || '10m'}</span>
+              <span>Prep: ${escapeHtml(recipe.prepTime || '5m')} | Cook: ${escapeHtml(recipe.cookTime || '10m')}</span>
             </div>
           </div>
         </div>
@@ -420,7 +422,7 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
         ${recipe.safetyAlerts ? `
           <div style="background-color: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); padding: 12px; border-radius: var(--border-radius-sm); font-size: 13px; line-height: 1.4; margin-bottom: 20px; display:flex; gap: 8px;">
             <span class="material-symbols-rounded" style="font-size: 20px; flex-shrink:0;">info</span>
-            <div><strong>Pediatric Note:</strong> ${recipe.safetyAlerts}</div>
+            <div><strong>Pediatric Note:</strong> ${escapeHtml(recipe.safetyAlerts)}</div>
           </div>
         ` : ''}
 
@@ -429,7 +431,7 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
           <span class="material-symbols-rounded">shopping_basket</span> Ingredients
         </h4>
         <ul class="recipe-list">
-          ${recipe.ingredients.map(ing => `<li>${ing}</li>`).join('')}
+          ${recipe.ingredients.map(ing => `<li>${escapeHtml(ing)}</li>`).join('')}
         </ul>
 
         <!-- Cooking Instructions -->
@@ -440,7 +442,7 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
           ${recipe.instructions.map((step, index) => `
             <div class="recipe-step">
               <div class="recipe-step-num">${index + 1}</div>
-              <div>${step}</div>
+              <div>${escapeHtml(step)}</div>
             </div>
           `).join('')}
         </div>
@@ -448,7 +450,7 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
         <!-- Nutritional Benefit -->
         ${recipe.nutritionBenefit ? `
           <div class="recipe-benefit">
-            <strong>Nutritional Value:</strong> ${recipe.nutritionBenefit}
+            <strong>Nutritional Value:</strong> ${escapeHtml(recipe.nutritionBenefit)}
           </div>
         ` : ''}
 

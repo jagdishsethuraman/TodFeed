@@ -1,5 +1,7 @@
 /* Todfeed - Home Dashboard Component */
 
+import { escapeHtml } from '../utils/sanitize.js';
+
 import { generateDailyMealSheet } from '../utils/recipeEngine.js';
 import { triggerConfetti } from '../utils/confetti.js';
 import { saveScheduleToFirestore } from '../utils/firebaseSync.js';
@@ -62,13 +64,13 @@ export function renderHomePanel(container, getProfile, switchPanel) {
       <div class="card welcome-card">
         <div class="welcome-card-content">
           <div class="welcome-text-slot">
-            <h2>Hi, ${profile.parentName || 'Caregiver'}! 👋</h2>
+            <h2>Hi, ${escapeHtml(profile.parentName || 'Caregiver')}! 👋</h2>
             <p class="welcome-message">
-              Ready to feed <strong>${profile.name}</strong> today? Let's track their meal milestones and keep feeding stress-free!
+              Ready to feed <strong>${escapeHtml(profile.name)}</strong> today? Let's track their meal milestones and keep feeding stress-free!
             </p>
             <div class="baby-badge-row">
-              <span class="baby-badge">🦖 ${profile.age} Months Old</span>
-              <span class="baby-badge">${profile.diet.length > 0 ? profile.diet.join(', ') : 'Standard Diet'}</span>
+              <span class="baby-badge">🦖 ${escapeHtml(profile.age)} Months Old</span>
+              <span class="baby-badge">${profile.diet.length > 0 ? escapeHtml(profile.diet.join(', ')) : 'Standard Diet'}</span>
             </div>
           </div>
           <div class="welcome-mascot-slot mascot-container age-${ageGroup}">
@@ -102,8 +104,8 @@ export function renderHomePanel(container, getProfile, switchPanel) {
             <h3>Diet & Allergies</h3>
           </div>
           <div class="profile-summary-details">
-            <p><strong>Diet Limits:</strong> ${profile.diet.length > 0 ? profile.diet.join(', ') : 'None'}</p>
-            <p><strong>Allergen Filters:</strong> ${profile.allergies.length > 0 ? profile.allergies.join(', ') : 'None'}</p>
+            <p><strong>Diet Limits:</strong> ${profile.diet.length > 0 ? escapeHtml(profile.diet.join(', ')) : 'None'}</p>
+            <p><strong>Allergen Filters:</strong> ${profile.allergies.length > 0 ? escapeHtml(profile.allergies.join(', ')) : 'None'}</p>
           </div>
           <span class="stat-action-link">Edit Profile <span class="material-symbols-rounded">arrow_forward</span></span>
         </div>
@@ -118,13 +120,13 @@ export function renderHomePanel(container, getProfile, switchPanel) {
         <div class="card upcoming-meal-card">
           <div class="upcoming-badge">
             <span class="material-symbols-rounded" style="font-size: 14px;">schedule</span>
-            Upcoming • ${upcomingMeal.time}
+            Upcoming • ${escapeHtml(upcomingMeal.time)}
           </div>
           <div class="upcoming-meal-body">
             <div class="upcoming-meal-info">
-              <span class="upcoming-meal-type">${upcomingMeal.mealType}</span>
-              <h4 class="upcoming-meal-title">${upcomingMeal.title}</h4>
-              <p class="upcoming-meal-desc">${upcomingMeal.desc}</p>
+              <span class="upcoming-meal-type">${escapeHtml(upcomingMeal.mealType)}</span>
+              <h4 class="upcoming-meal-title">${escapeHtml(upcomingMeal.title)}</h4>
+              <p class="upcoming-meal-desc">${escapeHtml(upcomingMeal.desc)}</p>
             </div>
             <div class="upcoming-meal-action">
               <button class="duo-btn duo-btn-primary btn-dashboard-mark-eaten" data-idx="${upcomingMealIndex}" type="button">

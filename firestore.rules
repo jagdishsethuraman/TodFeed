@@ -1,23 +1,19 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper function to check if the user is authenticated
-    function isAuthenticated() {
-      return request.auth != null;
-    }
-    
-    // Helper function to check if the request is from the owner of the document
     function isOwner(userId) {
-      return isAuthenticated() && request.auth.uid == userId;
+      return request.auth != null && request.auth.uid == userId;
     }
 
-    // Caregivers can read and write their own user document and all subcollections (schedules, settings, limits, etc.)
     match /users/{userId} {
-      allow read, write: if isOwner(userId);
-      
-      match /{document=**} {
-        allow read, write: if isOwner(userId);
-      }
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && request.resource.data.keys().hasOnly(['profile', 'pantry', 'onboarded', 'schedule']);
+    }
+
+    // Rate limits — only readable by owner, writable only by admin SDK (Cloud Functions)
+    match /rate_limits/{userId} {
+      allow read: if isOwner(userId);
+      allow write: if false;
     }
   }
 }

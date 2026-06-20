@@ -180,12 +180,16 @@
 
           <!-- Tab 2: API Section -->
           <div id="settings-tab-api" class="settings-tab-content" style="display: none; flex-direction: column; gap: 16px;">
-            <p class="settings-desc" style="font-size: 13px; color: var(--color-text-light); line-height: 1.4; text-align: left;">To unlock true AI-powered customized recipes, enter your Gemini API Key below. The key is stored securely in your browser's local storage.</p>
+            <p class="settings-desc" style="font-size: 13px; color: var(--color-text-light); line-height: 1.4; text-align: left;">
+              To unlock true AI-powered customized recipes, enter your Gemini API Key below.
+              <br><br>
+              <span style="color: var(--color-primary); font-weight: 800;">🔒 Session Security:</span> The key is stored temporarily in your browser's session storage. It is cleared automatically when you close the browser tab.
+            </p>
             <md-outlined-text-field
               id="input-api-key"
               label="Gemini API Key"
               type="password"
-              supporting-text="Your key stays on this device"
+              supporting-text="Your key stays on this device during the active session"
               style="width: 100%;">
             </md-outlined-text-field>
           </div>
