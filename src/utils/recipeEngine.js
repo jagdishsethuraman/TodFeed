@@ -395,7 +395,7 @@ export async function generateAiRecipe(selectedIngredients, profile) {
       const result = await generateRecipeFn({ selectedIngredients, profile });
       
       if (result.data && result.data.success) {
-        return result.data.recipe;
+        return validateRecipeSchema(result.data.recipe);
       } else {
         const errorMsg = result.data && result.data.message ? result.data.message : 'AI Recipe generation limit exceeded or failed.';
         throw new Error(errorMsg);
@@ -455,7 +455,7 @@ Return ONLY a JSON object. Do not include markdown code block formatting (no \`\
       const responseText = result.response.text();
       // Parse JSON safely
       const cleanJson = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-      return JSON.parse(cleanJson);
+      return validateRecipeSchema(JSON.parse(cleanJson));
     } catch (error) {
       console.warn(`Model ${modelName} failed:`, error);
       
@@ -670,7 +670,7 @@ export async function generateAiPairings(ingredient) {
       const result = await generatePairingsFn({ ingredient });
       
       if (result.data && result.data.success) {
-        return result.data.pairings;
+        return validatePairingsSchema(result.data.pairings);
       } else {
         const errorMsg = result.data && result.data.message ? result.data.message : 'AI pairings generation limit exceeded or failed.';
         throw new Error(errorMsg);
@@ -717,7 +717,7 @@ Return ONLY a JSON object. Do not include markdown code block formatting (no \`\
 
       const responseText = result.response.text();
       const cleanJson = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-      return JSON.parse(cleanJson);
+      return validatePairingsSchema(JSON.parse(cleanJson));
     } catch (error) {
       console.warn(`Model ${modelName} failed for pairings:`, error);
       
@@ -732,4 +732,43 @@ Return ONLY a JSON object. Do not include markdown code block formatting (no \`\
   }
 
   throw new Error(`Failed to generate pairings via Gemini. Checked models: [${modelsToTry.join(', ')}]. Details:\n${errors.map(e => `- ${e}`).join('\n')}`);
+}
+
+/**
+ * Validates the structure and field types of an AI-generated recipe object.
+ * Returns a sanitized object with fallback values to prevent component crashes.
+ */
+function validateRecipeSchema(recipe) {
+  if (!recipe || typeof recipe !== 'object') {
+    throw new Error("Invalid AI recipe format received.");
+  }
+  return {
+    recipeName: typeof recipe.recipeName === 'string' && recipe.recipeName.trim() ? recipe.recipeName.trim() : 'AI Baby Food Recipe',
+    texture: typeof recipe.texture === 'string' ? recipe.texture : 'Puree',
+    prepTime: typeof recipe.prepTime === 'string' ? recipe.prepTime : '5m',
+    cookTime: typeof recipe.cookTime === 'string' ? recipe.cookTime : '10m',
+    safetyAlerts: typeof recipe.safetyAlerts === 'string' ? recipe.safetyAlerts : '',
+    ingredients: Array.isArray(recipe.ingredients) ? recipe.ingredients.filter(i => typeof i === 'string' && i.trim()) : [],
+    instructions: Array.isArray(recipe.instructions) ? recipe.instructions.filter(i => typeof i === 'string' && i.trim()) : [],
+    nutritionBenefit: typeof recipe.nutritionBenefit === 'string' ? recipe.nutritionBenefit : ''
+  };
+}
+
+/**
+ * Validates the structure of an AI-generated pairings result object.
+ * Returns a sanitized object with fallback values to prevent component crashes.
+ */
+function validatePairingsSchema(result) {
+  if (!result || typeof result !== 'object') {
+    throw new Error("Invalid AI food pairings format received.");
+  }
+  const rawPairings = Array.isArray(result.pairings) ? result.pairings : [];
+  return {
+    ingredient: typeof result.ingredient === 'string' ? result.ingredient : '',
+    pairings: rawPairings.map(p => ({
+      name: p && typeof p.name === 'string' ? p.name.trim() : 'Ingredient',
+      reason: p && typeof p.reason === 'string' ? p.reason.trim() : 'Perfect pairing match.'
+    })).filter(p => p.name !== ''),
+    tips: typeof result.tips === 'string' ? result.tips : ''
+  };
 }

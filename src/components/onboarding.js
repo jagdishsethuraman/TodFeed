@@ -2,6 +2,7 @@
 
 import { generateDailyMealSheet } from '../utils/recipeEngine.js';
 import { saveScheduleToFirestore } from '../utils/firebaseSync.js';
+import { obfuscate } from '../utils/sanitize.js';
 
 export function initializeOnboarding(overlayContainer, onComplete) {
   let currentSlide = 0; // 0 to 7
@@ -368,20 +369,31 @@ export function initializeOnboarding(overlayContainer, onComplete) {
 
       let isValid = true;
 
-      if (name === "") {
-        if (errorMsg) errorMsg.style.display = 'block';
+      if (name === "" || name.length > 50 || !/^[a-zA-Z\s.-]+$/.test(name)) {
+        if (errorMsg) {
+          errorMsg.textContent = name === "" ? "Please enter your baby's name." : "Invalid name (under 50 characters, letters only).";
+          errorMsg.style.display = 'block';
+        }
         if (nameInput) nameInput.style.borderColor = 'var(--md-sys-color-error)';
         isValid = false;
       } else {
         if (errorMsg) errorMsg.style.display = 'none';
       }
 
-      if (pName === "") {
-        if (parentErrorMsg) parentErrorMsg.style.display = 'block';
+      if (pName === "" || pName.length > 50 || !/^[a-zA-Z\s.-]+$/.test(pName)) {
+        if (parentErrorMsg) {
+          parentErrorMsg.textContent = pName === "" ? "Please enter your name." : "Invalid name (under 50 characters, letters only).";
+          parentErrorMsg.style.display = 'block';
+        }
         if (parentNameInput) parentNameInput.style.borderColor = 'var(--md-sys-color-error)';
         isValid = false;
       } else {
         if (parentErrorMsg) parentErrorMsg.style.display = 'none';
+      }
+
+      if (babyAge < 4 || babyAge > 24) {
+        alert("Baby age must be between 4 and 24 months.");
+        isValid = false;
       }
 
       if (!isValid) return false;
@@ -418,7 +430,7 @@ export function initializeOnboarding(overlayContainer, onComplete) {
     };
 
     // Save profile to LocalStorage
-    localStorage.setItem('todfeed_profile', JSON.stringify(profile));
+    localStorage.setItem('todfeed_profile', obfuscate(JSON.stringify(profile)));
 
     // Generate fresh daily planner routine for this child
     const baseSchedule = generateDailyMealSheet(profile);

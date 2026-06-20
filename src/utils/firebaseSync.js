@@ -1,5 +1,6 @@
 import { db, auth } from '../firebase.js';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { obfuscate, deobfuscate } from './sanitize.js';
 
 // Helper to get active profile name for schedule storage key
 function getProfileKey(profile) {
@@ -69,7 +70,7 @@ export async function syncFromFirestore() {
       
       // 1. Sync Profile
       if (userData.profile) {
-        localStorage.setItem('todfeed_profile', JSON.stringify(userData.profile));
+        localStorage.setItem('todfeed_profile', obfuscate(JSON.stringify(userData.profile)));
       }
       
       // 2. Sync Pantry
@@ -98,7 +99,7 @@ export async function syncFromFirestore() {
       }
     } else {
       // If user document does not exist in Firestore, upload current LocalStorage values
-      const localProfileStr = localStorage.getItem('todfeed_profile');
+      const localProfileStr = deobfuscate(localStorage.getItem('todfeed_profile'));
       const localPantryStr = localStorage.getItem('todfeed_pantry');
       const localOnboarded = localStorage.getItem('todfeed_onboarded') === 'true';
       

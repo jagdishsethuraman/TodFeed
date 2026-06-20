@@ -56,11 +56,7 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
         if (settingsLink) {
           settingsLink.addEventListener('click', (e) => {
             e.preventDefault();
-            if (window.openSettings) {
-              window.openSettings('api');
-            } else {
-              document.querySelector('#settings-dialog').classList.add('active');
-            }
+            document.dispatchEvent(new CustomEvent('todfeed:open-settings', { detail: { tab: 'api' } }));
           });
         }
 
@@ -221,6 +217,14 @@ export function renderGeneratorPanel(container, getProfile, onAddRecipeToPlanner
       const addCustom = () => {
         const value = customInput.value.trim();
         if (value) {
+          if (value.length > 30) {
+            alert("Ingredient name is too long (maximum 30 characters).");
+            return;
+          }
+          if (!/^[a-zA-Z0-9\s-]+$/.test(value)) {
+            alert("Ingredient name contains invalid characters. Only letters, numbers, spaces, and hyphens are allowed.");
+            return;
+          }
           const formatted = value.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
           if (!selectedIngredients.includes(formatted)) {
             selectedIngredients.push(formatted);

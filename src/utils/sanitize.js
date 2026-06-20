@@ -22,3 +22,29 @@ export function escapeAttr(str) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 }
+
+/**
+ * Simple Base64 encoding to prevent plaintext shoulder-surfing or scanning
+ * of baby profile details in localStorage.
+ */
+export function obfuscate(text) {
+  if (!text) return '';
+  try {
+    return btoa(unescape(encodeURIComponent(text)));
+  } catch (e) {
+    return text;
+  }
+}
+
+/**
+ * Decodes the base64-obfuscated profile string back into standard text.
+ */
+export function deobfuscate(cipher) {
+  if (!cipher) return '';
+  try {
+    return decodeURIComponent(escape(atob(cipher)));
+  } catch (e) {
+    return cipher; // fallback if it was already plaintext
+  }
+}
+

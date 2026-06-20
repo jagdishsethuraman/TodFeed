@@ -3,6 +3,7 @@ import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getFunctions } from 'firebase/functions';
 import { getAnalytics, isSupported } from 'firebase/analytics';
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-check';
 
 const firebaseConfig = {
   apiKey: "AIzaSyBEDXyQzVaK_tcbnGFBeoFIPDkH8K381CI",
@@ -26,4 +27,30 @@ isSupported().then((supported) => {
 }).catch((err) => {
   console.warn("Firebase Analytics is not supported in this environment:", err);
 });
+
+// V-12: Initialize App Check (only in browser context)
+if (typeof window !== 'undefined') {
+  // Enable debug token for local development
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+  }
+
+  // Replace with your actual reCAPTCHA Enterprise site key from the Firebase Console
+  const appCheckSiteKey = 'YOUR_RECAPTCHA_ENTERPRISE_SITE_KEY';
+  
+  if (appCheckSiteKey && appCheckSiteKey !== 'YOUR_RECAPTCHA_ENTERPRISE_SITE_KEY') {
+    try {
+      initializeAppCheck(app, {
+        provider: new ReCaptchaEnterpriseProvider(appCheckSiteKey),
+        isTokenAutoRefreshEnabled: true
+      });
+      console.log("Firebase App Check initialized successfully.");
+    } catch (err) {
+      console.warn("Failed to initialize Firebase App Check:", err);
+    }
+  } else {
+    console.info("Firebase App Check site key not configured. Skipping App Check initialization.");
+  }
+}
+
 export const googleProvider = new GoogleAuthProvider();

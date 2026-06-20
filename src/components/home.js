@@ -176,9 +176,7 @@ export function renderHomePanel(container, getProfile, switchPanel) {
     const profileStatLink = container.querySelector('#link-to-profile-stat');
     if (profileStatLink) {
       profileStatLink.addEventListener('click', () => {
-        if (window.openSettings) {
-          window.openSettings('profile');
-        }
+        document.dispatchEvent(new CustomEvent('todfeed:open-settings', { detail: { tab: 'profile' } }));
       });
     }
 
@@ -221,9 +219,7 @@ export function renderHomePanel(container, getProfile, switchPanel) {
         render(); // Re-render in place
         
         // Notify other panels to refresh state if they are loaded
-        if (window.refreshPlannerState) {
-          window.refreshPlannerState();
-        }
+        document.dispatchEvent(new CustomEvent('todfeed:refresh-planner'));
       });
     }
 

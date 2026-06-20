@@ -35,8 +35,11 @@ export function renderPlannerPanel(container, getProfile) {
     saveScheduleToFirestore(scheduleState);
   }
 
-  // Exposed interface to add generated recipes
-  window.addRecipeToSlot = function(slotName, recipeDetails) {
+  // Listen for add recipe to slot event
+  document.addEventListener('todfeed:add-recipe-to-slot', (e) => {
+    const { slotName, recipeDetails } = e.detail || {};
+    if (!slotName || !recipeDetails) return;
+
     const profile = getProfile();
     loadScheduleState();
 
@@ -53,7 +56,7 @@ export function renderPlannerPanel(container, getProfile) {
       scheduleState[idx].reaction = null;
       saveScheduleState();
     }
-  };
+  });
 
   function render() {
     const profile = getProfile();
@@ -213,8 +216,10 @@ export function renderPlannerPanel(container, getProfile) {
     }
   }
 
-  // Expose renderer for dashboard sync
-  window.refreshPlannerState = render;
+  // Listen for refresh planner CustomEvent
+  document.addEventListener('todfeed:refresh-planner', () => {
+    render();
+  });
 
   // Initial render
   render();

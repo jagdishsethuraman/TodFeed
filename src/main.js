@@ -35,10 +35,11 @@ import { renderSafetyPanel } from './components/safety.js';
 import { auth, googleProvider } from './firebase.js';
 import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 import { syncFromFirestore, saveProfileToFirestore, saveOnboardingStateToFirestore } from './utils/firebaseSync.js';
+import { obfuscate, deobfuscate } from './utils/sanitize.js';
 
 // Global Profile Getter
 function getActiveProfile() {
-  const stored = localStorage.getItem('todfeed_profile');
+  const stored = deobfuscate(localStorage.getItem('todfeed_profile'));
   return stored ? JSON.parse(stored) : {
     name: "My Baby",
     age: 6,
@@ -124,11 +125,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Expose global openSettings method for other panels to use
-  window.openSettings = function(tabName = 'profile') {
+  // Listen for settings open CustomEvent
+  document.addEventListener('todfeed:open-settings', (e) => {
     btnSettings.click();
+    const tabName = e.detail && e.detail.tab ? e.detail.tab : 'profile';
     switchSettingsTab(tabName);
-  };
+  });
 
   // Settings trigger (Open modal and load values)
   btnSettings.addEventListener('click', () => {
@@ -176,6 +178,18 @@ document.addEventListener('DOMContentLoaded', () => {
       alert("Please fill in both Baby's Name and Your Name.");
       return;
     }
+    if (babyNameVal.length > 50 || parentNameVal.length > 50) {
+      alert("Names must be under 50 characters.");
+      return;
+    }
+    if (!/^[a-zA-Z\s.-]+$/.test(babyNameVal) || !/^[a-zA-Z\s.-]+$/.test(parentNameVal)) {
+      alert("Names can only contain letters, spaces, hyphens, and periods.");
+      return;
+    }
+    if (babyAgeVal < 4 || babyAgeVal > 24) {
+      alert("Baby age must be between 4 and 24 months.");
+      return;
+    }
 
     // Read selected diets
     const diet = [];
@@ -203,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
       parentName: parentNameVal,
       parentRole: parentRoleVal
     };
-    localStorage.setItem('todfeed_profile', JSON.stringify(updatedProfile));
+    localStorage.setItem('todfeed_profile', obfuscate(JSON.stringify(updatedProfile)));
 
     // Sync profile to Firestore
     saveProfileToFirestore(updatedProfile);
@@ -245,9 +259,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const initializeRecipeGenerator = () => {
     renderGeneratorPanel(panelRecipe, getActiveProfile, (slotName, recipeDetails) => {
       // Add recipe to planner slot
-      if (window.addRecipeToSlot) {
-        window.addRecipeToSlot(slotName, recipeDetails);
-      }
+      document.dispatchEvent(new CustomEvent('todfeed:add-recipe-to-slot', {
+        detail: { slotName, recipeDetails }
+      }));
       // Switch view to planner panel
       switchPanel('planner');
     });
