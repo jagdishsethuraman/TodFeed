@@ -75,7 +75,7 @@ exports.generateRecipe = onCall({ cors: ["https://todfeed-app-61326.web.app", "h
   }
 
   // 4. Generate AI Recipe
-  const { age, diet = [], allergies = [], country = "us" } = profile;
+  const { diet = [], allergies = [], country = "us" } = profile;
 
   const prompt = `You are an expert pediatric nutritionist. Write a single, highly healthy and safe baby food recipe.
 Profile of the Baby:
